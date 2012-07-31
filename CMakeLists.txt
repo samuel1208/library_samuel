@@ -13,17 +13,20 @@ endif()
 #check the system type
 if(UNIX)
     add_definitions(-DUNIX)
+	find_package(OpenCV PATHS "/home/fshen/Install_samuel/OpenCV/OpenCV-2.4.2/Debug/share/OpenCV" NO_DEFAULT_PATH)
 elseif(WIN32)
     add_definitions(-DWIN32)
+	find_package(OpenCV)
 else()
     message("this library only support on windows and unix")
 	return()	
 endif()
 
-find_package(OpenCV PATHS "/home/fshen/Install_samuel/OpenCV/OpenCV-2.4.2/Debug/share/OpenCV" NO_DEFAULT_PATH)
+message("The OpenCV path is as follow:")
 message(${OpenCV_INCLUDE_DIRS})
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+
 add_subdirectory(modules)
 add_subdirectory(testbed)

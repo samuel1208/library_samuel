@@ -32,5 +32,9 @@ include_directories(./MManage/inc)
 #generate the MMange library
 add_subdirectory(MManage)
 
+#generate the OCLCore library
+if(OCL_ENABLE)
+    add_subdirectory(OCLCore)
+endif()
 
 
