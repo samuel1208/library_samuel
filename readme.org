@@ -1,10 +1,11 @@
 * module
 ** cmake 
-   usage: cmake -D SHARED_LIBRARY .. // create the shared library. default static library.
+   usage: cmake -D SHARED_LIBRARY  -D OCL_ENABLE=on .. // create the shared library. default static library.
 ** memory manage
    usage: 1.buffer = MM_MemAlloc(NULL, size) //get a big buffer from system
           2.MM_MemMgrCreate(buffer,lMemSize ) // create a memory manage handle form buffer. lMemSize<size
           ...
           3.MM_MemFree(NULL, &buffer)
+** OpenCL module
 * Todo list 
  
