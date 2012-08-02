@@ -27,7 +27,14 @@ include_directories(../modules/MManage/inc)
 
 
 #generate the testbeds
-add_subdirectory(test)
+if(OCL_ENABLE)
+include_directories(../modules/OCLLibrary/inc)
+include_directories(../modules/OCLCore/inc)
+include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/CL)
+link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/Win32)
+add_subdirectory(test_ocl)
+
+endif()
 
 
 

@@ -16,7 +16,6 @@ typedef  int                 MBool ;
 typedef  void                MVoid ;
 typedef  void*               MHandle ;
 
-//#define MNull		0
 #define MFalse		0
 #define MTrue		1
 
@@ -38,6 +37,18 @@ typedef  void*               MHandle ;
 	    #endif
    #endif
 #endif 
+
+#define SAM_SUCCESS		0
+#define SAM_ERROR       -1
+
+#define EXIT            goto exit
+#define __SAM_BEGIN__							                    \
+	{						                                        \
+
+
+#define __SAM_END__								                    \
+	EXIT; exit:;							                            \
+	}
 
 
 

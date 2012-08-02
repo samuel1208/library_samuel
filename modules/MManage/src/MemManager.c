@@ -1,5 +1,7 @@
 
 #include"MemManager.h"
+#include<malloc.h>
+#include<string.h>
 //================ Memory Manager Interfaces ================//
 
 #define ALIGN_SIZE		32UL//4byte

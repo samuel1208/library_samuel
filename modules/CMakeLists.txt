@@ -34,7 +34,17 @@ add_subdirectory(MManage)
 
 #generate the OCLCore library
 if(OCL_ENABLE)
+    find_package(CUDA)
+	message("\n------------------------------------")
+    message("The OCL path is as follow:")
+    message(${CUDA_TOOLKIT_ROOT_DIR})
+    message("------------------------------------\n")
+    include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/CL)
+	link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/Win32)
+	
+    include_directories(./OCLCore/inc)	
     add_subdirectory(OCLCore)
+	add_subdirectory(OCLLibrary)	
 endif()
 
 

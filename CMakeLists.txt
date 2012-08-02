@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
+cmake_policy(SET CMP0015 NEW)
 
 #define the SHARED_LIBRARY to generate shared library
 if(SHARED_LIBRARY)
@@ -16,14 +17,16 @@ if(UNIX)
 	find_package(OpenCV PATHS "/home/fshen/Install_samuel/OpenCV/OpenCV-2.4.2/Debug/share/OpenCV" NO_DEFAULT_PATH)
 elseif(WIN32)
     add_definitions(-DWIN32)
-	find_package(OpenCV)
+	find_package(OpenCV PATHS "D:/Program Files/OpenCV/OpenCV-2.3.0/Debug/"  NO_DEFAULT_PATH)
+	#include("D:/software/OpenCV/OpenCV-2.3.0/build/OpenCVConfig.cmake")
 else()
     message("this library only support on windows and unix")
 	return()	
 endif()
-
+message("\n------------------------------------")
 message("The OpenCV path is as follow:")
-message(${OpenCV_INCLUDE_DIRS})
+message(${OpenCV_LIB_DIR})
+message("------------------------------------\n")
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
