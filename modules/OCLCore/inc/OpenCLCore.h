@@ -35,14 +35,6 @@ enum clMemcpyFlag
 	clMemcpyBufToImg  = 5 ,
 };
 
-typedef struct _OCL_CORE_
-{
-	cl_context			  g_CLContext ;			//cl context
-	cl_device_id 		  g_CLDevices ;		    //cl devices
-	size_t				  g_CLDeviceListSize  ;	//cl device size list
-	cl_command_queue	  g_CLCommandQueue ;	//cl command queue
-	cl_program            g_CLProgram ;         //cl program
-} OCL_CORE;
 /************************************************************************************/
 
 /************************************************************************************/
@@ -53,25 +45,16 @@ extern "C" {
 #endif
 
 //create an OCL engine 
-DLL_EXPORTS 	int    clIntialEnviroment(MHandle OCLEngine, char *sourceCode);
-DLL_EXPORTS     int  clUnintialEnviroment(MHandle oclHandle);
-
-/*******************************************************************
-fileName   : file's path ,including the file's name.
-sourceCode : The pointer to store the source codes.
-offset     : The offset of the sourceCode pointer.
-             First must be equal to zero , can be set to zero.
-return :  0 means correct.
-********************************************************************/
-DLL_EXPORTS  int  clGetCode(char *fileName, char *sourceCode, int *offset);
+// if ct,cq,cd != NULL , intialize the envrioment form outside
+DLL_EXPORTS  int  clIntialEnviroment(char *sourceCode, cl_context ct, cl_command_queue cq, cl_device_id cd);
+DLL_EXPORTS  int  clUnintialEnviroment();
 
 
-////create buffer memory
-DLL_EXPORTS  int  clMallocBuf(cl_context cc, void **buf, size_t size, cl_mem_flags  flag = CL_MEM_READ_WRITE);
-//
-////copy buffer memory between cpu and gpu
-DLL_EXPORTS  int  clMemcpyBuf(cl_command_queue cq,
-	                          void **src, void **dst, 
+//create buffer memory
+DLL_EXPORTS  int  clMallocBuf(void **buf, size_t size, cl_mem_flags  flag = CL_MEM_READ_WRITE);
+
+//copy buffer memory between cpu and gpu
+DLL_EXPORTS  int  clMemcpyBuf(void **src, void **dst, 
 					          size_t size, 
 							  clMemcpyFlag flag, 
 							  size_t src_offset = 0, 
@@ -80,8 +63,7 @@ DLL_EXPORTS  int  clMemcpyBuf(cl_command_queue cq,
 							  cl_event* ev = NULL);
 
 //create buffer memory
-DLL_EXPORTS  int  clMallocImg2D(cl_context cc,
-	                            void **img, 
+DLL_EXPORTS  int  clMallocImg2D(void **img, 
 								size_t width, 
 								size_t height,
 								cl_image_format* imageFormat = NULL, 
@@ -89,8 +71,7 @@ DLL_EXPORTS  int  clMallocImg2D(cl_context cc,
 
 //copy memory from cpu to gpu
 // width , height and src_origin set a rectangular region of the img
-DLL_EXPORTS  int  clMemcpyImg2D(cl_command_queue cq,
-	                            void **src, void **dst, 
+DLL_EXPORTS  int  clMemcpyImg2D(void **src, void **dst, 
 								size_t width,
 								size_t height, 
 								clMemcpyFlag flag ,
@@ -103,6 +84,11 @@ DLL_EXPORTS  int  clMemcpyImg2D(cl_command_queue cq,
 
 //free the buffer memory
 DLL_EXPORTS  int  clMemFree(void **mem);
+
+//get ocl_core para
+DLL_EXPORTS  cl_context			  GetOclContext() ;			//cl context
+DLL_EXPORTS	 cl_command_queue	  GetOclCommandQueue() ;	//cl command queue
+DLL_EXPORTS  cl_program           GetOclProgram() ;         //cl program
 //
 
 

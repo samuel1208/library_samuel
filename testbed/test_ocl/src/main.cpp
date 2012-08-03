@@ -4,52 +4,38 @@
 #include<string.h>
 #include <kernelInterface.h>
 #include <utilities_API.h>
+#include <OpenCLCore.h>
+#include <string>
 
 int main(int argc, char **argv)
 {
 	int status  = -1;
-	OCL_ENGINE *cl_Engine= NULL;
-	cl_Engine = (OCL_ENGINE *)malloc(sizeof(OCL_ENGINE));
-	unsigned char *c_data = (unsigned char *)malloc(1024); 
-	int *c_hist = (int *)malloc(256*sizeof(int));
-	memset(c_hist, 0 , 1024);
+	
+	int *c_data = (int *)malloc(512*512*4);
+	int *result = (int *)malloc(512*512*4);
 
-	for(int i=0; i<1024; i++)
-		c_data[i] = i%256;
-    status = clCreateEngine(cl_Engine);
+	for(int i=0; i<512*512; i++)
+		c_data[i] = 1;
+    status = clInitialKernelAPI();
 
 	cl_mem g_data = NULL;
-	cl_mem g_hist = NULL;
+	cl_mem g_temp = NULL;
+	cl_mem g_result = NULL;
 	
-	status = clMallocBuf(cl_Engine->ocl_Core.g_CLContext, (void**)(&g_data),1024);
-	status = clMallocBuf(cl_Engine->ocl_Core.g_CLContext, (void**)(&g_hist),256*sizeof(int));
+	status = clMallocBuf((void**)(&g_data),512*512*4);
+	status = clMallocBuf((void**)(&g_result),512*512*4);
 
-	status = clMemcpyBuf(cl_Engine->ocl_Core.g_CLCommandQueue,  (void**)(&c_data),(void**)(&g_data),1024, clMemcpyHostToDevice);
-	status = clMemcpyBuf(cl_Engine->ocl_Core.g_CLCommandQueue,  (void**)(&c_hist),(void**)(&g_hist), 256*4, clMemcpyHostToDevice);
+	status = clMemcpyBuf((void**)(&c_data),(void**)(&g_data),512*512*4, clMemcpyHostToDevice);
 
+	//status = ScanEexclusive(g_data, g_result, 512*512, NULL);
+	status = ZeroMemory_OCL(g_data, 512*512*4, NULL);
 
-	status = HistogramStatistics_OCL(g_data, g_hist, 1024, cl_Engine->ocl_Core.g_CLCommandQueue,
-		                    cl_Engine->kernel_API.g_HistogramStatistics_kernel, NULL);
+	status = clMemcpyBuf((void**)(&g_data),(void**)(&result),512*512*4, clMemcpyDeviceToHost);
 
-	status = clMemcpyBuf(cl_Engine->ocl_Core.g_CLCommandQueue,(void**)(&g_hist), (void**)(&c_hist), 256*4, clMemcpyDeviceToHost);
-
-	for(int i=0; i<256; i++)
-		printf("%d \n", c_hist[i]);
+	for(int i=0; i<512*512; i++)
+		printf("%d \n", result[i]);
 		
-	clReleaseEngine(cl_Engine);
+	clReleaseKernelAPI();
 
-	//test for opencv2.4.2
-	/*
-    const char *keymap =  
-      "{ f | filename | default_value | file name }"
-      "{ o | option   | 100           | option }" ;
-    cv::CommandLineParser parser(argc, argv, keymap) ;
-
-    std:: string file = parser.get<std::string>("filename",0);
-    int o = parser.get<int>("option");
-    
-    printf("%s, %d", file.c_str() , o);
-    printf("ok");
-	*/
     return 0;
 }
