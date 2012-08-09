@@ -19,6 +19,9 @@ typedef  void*               MHandle ;
 #define MFalse		0
 #define MTrue		1
 
+#define MAX(a,b) ((a)>(b)?(a):(b))
+#define MIN(a,b) ((a)<(b)?(a):(b))
+
 //the dll macro
 #ifndef  DLL_LIBRARY
     #define DLL_EXPORTS 

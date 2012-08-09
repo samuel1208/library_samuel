@@ -31,6 +31,7 @@ include_directories(./MManage/inc)
 
 #generate the MMange library
 add_subdirectory(MManage)
+add_subdirectory(ImageProcess)
 
 #generate the OCLCore library
 if(OCL_ENABLE)
