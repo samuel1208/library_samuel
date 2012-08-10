@@ -70,7 +70,8 @@ static int clCreateKetnelFunc(KERNEL_API *kernel_API)
 	kernel_API->g_ZeroMemory_kernel1         = clCreateKernel(cp, "zeroMemory_kernel1",         &status);
 	kernel_API->g_ZeroMemory_kernel2         = clCreateKernel(cp, "zeroMemory_kernel2",         &status);
 	kernel_API->g_ZeroMemory_kernel4         = clCreateKernel(cp, "zeroMemory_kernel4",         &status);
-
+	//transpose
+	kernel_API->g_Transpose_kernel           = clCreateKernel(cp, "transpose_kernel"  ,         &status);
 	return status;
 }
 
@@ -86,6 +87,10 @@ static int clReleaseKetnelFunc(KERNEL_API *kernel_API)
 	status = clReleaseKernel(kernel_API->g_Reduction_Min_kernel);
 	status = clReleaseKernel(kernel_API->g_Scan_Exclusive_Kernel);
 	status = clReleaseKernel(kernel_API->g_UniformAdd_Kernel);
+	status = clReleaseKernel(kernel_API->g_ZeroMemory_kernel1);
+	status = clReleaseKernel(kernel_API->g_ZeroMemory_kernel2);
+	status = clReleaseKernel(kernel_API->g_ZeroMemory_kernel4);
+	status = clReleaseKernel(kernel_API->g_Transpose_kernel);
 	return status;
 }
 

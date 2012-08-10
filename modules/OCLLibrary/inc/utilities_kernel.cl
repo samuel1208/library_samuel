@@ -231,3 +231,48 @@ __kernel  void  uniformAdd_Kernel(__global int2*       g_data,
 		g_data[index].y += uni;
 	//g_data[index] = value;
 }
+
+/*********************************************************************************
+                                   matrix transpose 
+**********************************************************************************/
+
+/*************************************************************************
+                     matrix transpose  : only support uchar 
+					 the shared memory exit bank conflict
+ *************************************************************************/
+
+__kernel void transpose_kernel(__global uchar  *idata,
+							   __global uchar  *odata, 
+							   int width, int height,
+							   __local uchar *lMem)
+{
+#if 1
+	uint tId_Bx  = get_local_id(0);
+	uint tId_By  = get_local_id(1); 
+	uint bId_x   = get_group_id(0);
+	uint bId_y   = get_group_id(1);	
+	uint blockSizeX   = get_local_size(0);
+	uint blockSizeY   = get_local_size(1);
+	uint tId_Gx = get_global_id(0);
+    uint tId_Gy = get_global_id(1); 
+
+	if ((tId_Gx<width) && (tId_Gy<height))
+	{
+		lMem[tId_Bx + tId_By*blockSizeX] = idata[tId_Gx +tId_Gy*width];
+	}
+	barrier(CLK_LOCAL_MEM_FENCE);
+
+	uint  xIndex = bId_y * blockSizeX + tId_Bx;
+	uint  yIndex = bId_x * blockSizeX + tId_By;
+
+	if ((xIndex<height) && (yIndex<width))
+	{
+		odata[yIndex*height + xIndex] = lMem[tId_By + tId_Bx*blockSizeX];
+	}
+#else 	
+	uint tId_Gx = get_global_id(0);
+    uint tId_Gy = get_global_id(1); 
+	if ((tId_Gx<width) && (tId_Gy<height))
+		odata[tId_Gy+tId_Gx*height] = idata[tId_Gx +tId_Gy*width];
+#endif
+}

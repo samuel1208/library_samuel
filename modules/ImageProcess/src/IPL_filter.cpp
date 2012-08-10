@@ -81,9 +81,9 @@ DLL_EXPORTS int  MedianFilter(const unsigned char *srcImg , int srcStep,
                 can  separate it into x and y directions   
 ******************************************************************/
 static int convolution_X(const unsigned char *srcImg , int srcStep,
-							unsigned char *dstImg,  int dstStep,
-							int width, int height,  int channel, 
-							float *kernel,int kernelSize, float kernelSum)
+						       unsigned char *dstImg,  int dstStep,
+							   int width, int height,  int channel, 
+						 float *kernel,int kernelSize, float kernelSum)
 {
 	int res = -1;
 	int semiKernelSize = kernelSize/2;

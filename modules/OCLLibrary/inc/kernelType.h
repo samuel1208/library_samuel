@@ -13,6 +13,8 @@ typedef struct _KERNEL_API_
 	cl_kernel  g_ZeroMemory_kernel1;
 	cl_kernel  g_ZeroMemory_kernel2;
 	cl_kernel  g_ZeroMemory_kernel4;
+	//transpose
+	cl_kernel  g_Transpose_kernel;
 }KERNEL_API;
 
 extern KERNEL_API kernelAPI;
