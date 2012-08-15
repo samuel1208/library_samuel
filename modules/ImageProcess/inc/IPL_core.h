@@ -16,6 +16,9 @@ enum RESIZE_FLAG
 {
 	IPL_RESIZE_INTERPOLATION_BILINEAR  = 0,
 };
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 DLL_EXPORTS int  CVTColor(
 					      const unsigned char *srcImg , int srcStep,
@@ -27,6 +30,9 @@ DLL_EXPORTS int  Resize(const unsigned char *srcImg, int srcWidth, int srcHeight
 					    unsigned char *dstImg, int dstWidth, int dstHeight, int dstStep,
 					    float xScale, float yScale, int channel, int InterpolationFlag );
 
+#ifdef __cplusplus
+}
+#endif
 #endif  
 
 

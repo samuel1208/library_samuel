@@ -5,6 +5,10 @@
 
 #include "define.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 DLL_EXPORTS int  MedianFilter(
 						      const unsigned char *srcImg , int srcStep,
 				              unsigned char *dstImg,  int dstStep,
@@ -16,6 +20,10 @@ DLL_EXPORTS int  GaussianFilter(const unsigned char *srcImg , int srcStep,
 							    int width, int height,  int channel,
 							    float *gauss_kernel,    int kernelSize, float kernelSum);
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  
 
