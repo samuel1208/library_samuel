@@ -24,6 +24,8 @@ endmacro(define_testbed)
 #the include files 
 include_directories(../common/include)
 include_directories(../modules/MManage/inc)
+include_directories(../modules/ImageProcess/inc)
+add_subdirectory(test)
 
 
 #generate the testbeds
@@ -35,6 +37,9 @@ link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/Win32)
 add_subdirectory(test_ocl)
 
 endif()
+
+
+
 
 
 

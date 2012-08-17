@@ -21,7 +21,7 @@ typedef  void*               MHandle ;
 
 #define MAX(a,b) ((a)>(b)?(a):(b))
 #define MIN(a,b) ((a)<(b)?(a):(b))
-
+#define PI_T 3.1415926
 //the dll macro
 #ifndef  DLL_LIBRARY
     #define DLL_EXPORTS 
@@ -44,14 +44,19 @@ typedef  void*               MHandle ;
 #define SAM_SUCCESS		0
 #define SAM_ERROR       -1
 
+typedef struct
+{
+  double  real;
+  double  imaginary; 
+}complex_t;
+
+
+
 #define EXIT            goto exit
-#define __SAM_BEGIN__							                    \
-	{						                                        \
+#define __SAM_BEGIN__	     {	       
 
 
-#define __SAM_END__								                    \
-	EXIT; exit:;							                            \
-	}
+#define __SAM_END__    exit:; }
 
 
 
