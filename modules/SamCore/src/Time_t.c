@@ -20,7 +20,7 @@
 	else
 	{
 	    QueryPerformanceCounter(&s_tm_end);
-	    printf("%s : %f ms \n",timeName, (double)(s_tm_end.QuadPart-s_tm_start.QuadPart)/s_tm_freq.QuadPart*1000));
+	    printf("%s : %f ms \n",timeName, (double)(s_tm_end.QuadPart-s_tm_start.QuadPart)/s_tm_freq.QuadPart*1000);
 	}
     }
 #else

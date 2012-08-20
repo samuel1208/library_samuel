@@ -120,10 +120,6 @@ for (i=0;i<n-1;i++) {
       j += k;
    }
 
- for(i=0; i<n; i++)
-   printf("%f\n", dst[i].real);
-   /* Compute the FFT */
-
    c1 = -1.0; 
    c2 = 0.0;
    l2 = 1;
