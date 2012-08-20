@@ -44,6 +44,7 @@ typedef  void*               MHandle ;
 #define SAM_SUCCESS		0
 #define SAM_ERROR       -1
 
+
 typedef struct
 {
   double  real;

@@ -1,1 +1,1 @@
-define_module(ImageProcess MManage ${OpenCV_LIBS})
+define_module(ImageProcess SamCore ${OpenCV_LIBS})

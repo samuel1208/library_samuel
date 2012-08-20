@@ -1,4 +1,4 @@
-define_testbed(test MManage ImageProcess ${OpenCV_LIBS})
+define_testbed(test SamCore ImageProcess ${OpenCV_LIBS})
 
 
 

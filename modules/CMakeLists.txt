@@ -27,10 +27,10 @@ endmacro(define_module)
 
 #the include files 
 include_directories(../common/include)
-include_directories(./MManage/inc)
+include_directories(./SamCore/inc)
 
 #generate the MMange library
-add_subdirectory(MManage)
+add_subdirectory(SamCore)
 add_subdirectory(ImageProcess)
 
 #generate the OCLCore library
