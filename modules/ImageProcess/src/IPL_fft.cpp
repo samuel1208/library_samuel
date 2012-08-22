@@ -4,10 +4,14 @@
 #include "IPL_fft.h"
 #include "MemManager.h"
 
-/*                  DFT
-                N-1  
-    x(n) = 1/N * Σx(k)*e(-j*k*2*Pi*n/N)  for n=0,..N-1
-                k=0
+/*                  *** DFT***
+                  N-1
+                  ---
+              1   \          - j*k*2*pi*n /N
+      X(n) = ---   >   x(k) e                     n=0..N-1
+              N   /                                
+                  ---
+                  k=0
     e(j@) = cos(@) + jsin(@)
 */
 
@@ -35,8 +39,8 @@
 	    dst[i].imaginary -= src[j] * sin(angle);
 	    angle += temp;
         }
-	dst[i].real /= N;
-	dst[i].imaginary /= N;
+	dst[i].real /= 1;
+	dst[i].imaginary /= 1;
     }
     
     status = 0;
@@ -44,10 +48,14 @@
     return status;
 }
 
-/*                  IDFT
-            N-1  
-    x(n)  =  Σx(k)*e(-j*k*2*Pi*n/N)  for n=0,..N-1
-            k=0
+/*                    ***IDFT***
+               N-1
+               ---
+               \          - j*k*2*pi*n /N
+      X(n) =    >   x(k) e                     n=0..N-1
+               /                                
+               ---
+               k=0
     e(j@) = cos(@) + jsin(@)
 */
 DLL_EXPORTS   int  IDFT_1D(complex_t *src, double *dst, int N)
@@ -90,69 +98,154 @@ DLL_EXPORTS   int  IDFT_1D(complex_t *src, double *dst, int N)
 
 DLL_EXPORTS int FFT_1D(double *src, complex_t *dst, int N)
 {
-   long n,i,i1,j,k,i2,l,l1,l2;
-   double c1,c2,t1,t2,u1,u2,z;
+    int num, num2, i,j,k,l, i1,l1,l2;
+    double c1,c2,t1,t2,u1,u2, z;
 
-   /* Calculate the number of points */
-   n = 1;
-   for (i=0;i<N;i++) 
-      n *= 2;
+    if ((NULL == src) || (NULL == dst))
+        return -1;
+    /* Calculate the number of points */
+    num = 1;
+    for (i=0;i<N;i++) 
+        num *= 2;
 
-   /* Do the bit reversal */
-   i2 = n >> 1;
-   j = 0;
+    /* Do the bit reversal */
+    num2 = num >> 1;
+    j = 0;
 
-for (i=0;i<n;i++) {
-  dst[i].imaginary=0;
-  dst[i].real=src[i];
- }
+    for (i=0;i<num;i++) 
+    {
+        dst[i].imaginary=0;
+	dst[i].real=src[i];
+    }
 
-for (i=0;i<n-1;i++) {
-      if (i < j) {
-	dst[i].real = src[j];
-	dst[j].real = src[i];	
-      }
-      k = i2;
-      while (k <= j) {
-         j -= k;
-         k >>= 1;
-      }
-      j += k;
-   }
+    //Rader algorithm
+    for (i=0;i<num-1;i++)
+    {
+        if (i < j)
+	{
+	    dst[i].real = src[j];
+	    dst[j].real = src[i];	
+	}
+	k = num2;
+	while (k <= j) 
+	{
+	    j -= k;
+	    k >>= 1;
+	}
+	j += k;
+    }
 
-   c1 = -1.0; 
-   c2 = 0.0;
-   l2 = 1;
-   for (l=0;l<N;l++) {
-      l1 = l2;
-      l2 <<= 1;
-      u1 = 1.0; 
-      u2 = 0.0;
-      for (j=0;j<l1;j++) {
-         for (i=j;i<n;i+=l2) {
-            i1 = i + l1;
-            t1 = u1 * dst[i1].real - u2 * dst[i1].imaginary;
-            t2 = u1 * dst[i1].imaginary + u2 * dst[i1].real;
-            dst[i1].real = dst[i].real - t1; 
-            dst[i1].imaginary = dst[i].imaginary - t2;
-            dst[i].real += t1;
-            dst[i].imaginary += t2;
-         }
-         z =  u1 * c1 - u2 * c2;
-         u2 = u1 * c2 + u2 * c1;
-         u1 = z;
-      }
-      c2 = -sqrt((1.0 - c1) / 2.0);
-      c1 = sqrt((1.0 + c1) / 2.0);
-   }
+    c1 = -1.0; 
+    c2 = 0.0;
+    l2 = 1;
+    for (l=0;l<N;l++) 
+    {
+        l1 = l2;
+	l2 <<= 1;
+	u1 = 1.0; 
+	u2 = 0.0;
+	for (j=0;j<l1;j++) 
+	{
+	    for (i=j;i<num;i+=l2) 
+	    {
+	        i1 = i + l1;
+		t1 = u1 * dst[i1].real - u2 * dst[i1].imaginary;
+		t2 = u1 * dst[i1].imaginary + u2 * dst[i1].real;
+		dst[i1].real = dst[i].real - t1; 
+		dst[i1].imaginary = dst[i].imaginary - t2;
+		dst[i].real += t1;
+		dst[i].imaginary += t2;
+	    }
+	    z  = u1 * c1 - u2 * c2;
+	    u2 = u1 * c2 + u2 * c1;
+	    u1 = z;
+	}
+	c2 = -sqrt((1.0 - c1) / 2.0);
+	c1 = sqrt((1.0 + c1) / 2.0);
+    }
 
-   /* Scaling for forward transform */
-   for (i=0;i<n;i++)
-   {
-      dst[i].real /= n;
-      dst[i].imaginary /= n;
-   }
-   
-   return  0;
+    /* Scaling for forward transform */
+    for (i=0;i<num;i++)
+    {
+        dst[i].real /= num;
+	dst[i].imaginary /= num;
+    }
+    return  0;
+}
+
+DLL_EXPORTS  int FFT_1D_1(double *src, complex_t *dst, int N)
+{
+    int m,i,j,k, num,num2, le, lei, ip;;
+    double t1,t2, c1,c2, u1,u2, z;
+    
+    if ((NULL == src) || (NULL == dst))
+        return -1;
+
+    num = 1;
+    for (i=0;i<N;i++) 
+        num *= 2;
+
+    /* Do the bit reversal */
+    num2 = num >> 1;
+    j = 0;
+
+    for (i=0;i<num;i++) 
+    {
+        dst[i].imaginary=0;
+	dst[i].real=src[i];
+    }
+
+    //Rader algorithm
+    for (i=0;i<num-1;i++)
+    {
+        if (i < j)
+	{
+	    dst[i].real = src[j];
+	    dst[j].real = src[i];	
+	}
+	k = num2;
+	while (k <= j) 
+	{
+	    j -= k;
+	    k >>= 1;
+	}
+	j += k;
+    }
+
+    
+
+    for(m=1; m<=N; m++)
+    {
+        le = 2<<(m-1);
+	lei = le/2;
+	u1 = 1.0;
+	u2 = 0.0;
+	c1 = cos(PI_T/lei);
+	c2 = -sin(PI_T/lei);
+	
+	for(j=0; j<lei; j++)
+	{
+	    for(i=j; i<num; i+=le)
+	    {
+	        ip = i+lei;		
+		t1 = u1 * dst[ip].real - u2 * dst[ip].imaginary;
+		t2 = u1 * dst[ip].imaginary + u2 * dst[ip].real;
+		dst[ip].real = dst[i].real - t1; 
+		dst[ip].imaginary = dst[i].imaginary - t2;
+		dst[i].real += t1;
+		dst[i].imaginary += t2;
+	    }
+	    z  = u1 * c1 - u2 * c2;
+	    u2 = u1 * c2 + u2 * c1;
+	    u1 = z;
+	}
+
+    }
+    for (i=0;i<num;i++)
+    {
+        dst[i].real /= num;
+	dst[i].imaginary /= num;
+    }
+    return 0;
 }
 //DLL_EXPORTS  int  IFFT_1D(complex_t *src, double *dst, int N);

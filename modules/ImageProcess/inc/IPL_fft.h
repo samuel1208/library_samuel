@@ -9,6 +9,8 @@ DLL_EXPORTS  int  IDFT_1D(complex_t *src, double *dst, int N);
 
 DLL_EXPORTS  int  FFT_1D(double *src,  complex_t *dst, int N);
 
+DLL_EXPORTS  int  FFT_1D_1(double *src,  complex_t *dst, int N);
+
 DLL_EXPORTS  int  IFFT_1D(complex_t *src, double *dst, int N);
 
 #endif
