@@ -2,7 +2,7 @@
 #pragma OPENCL EXTENSION  cl_khr_local_int32_base_atomics : enable
 #pragma OPENCL EXTENSION  cl_khr_local_int32_extended_atomics : enable
 #pragma OPENCL EXTENSION  cl_khr_global_int32_base_atomics : enable
-
+#pragma OPENCL EXTENSION  cl_khr_fp64 : enable
 /***********************************************************************************
                               set memory value with zero 
  ***********************************************************************************/
@@ -240,7 +240,7 @@ __kernel  void  uniformAdd_Kernel(__global int2*       g_data,
                      matrix transpose  : only support uchar 
 					 the shared memory exit bank conflict
  *************************************************************************/
-
+//have bank conflict, need +1 int each line
 __kernel void transpose_kernel(__global uchar  *idata,
 							   __global uchar  *odata, 
 							   int width, int height,

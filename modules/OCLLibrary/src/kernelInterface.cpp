@@ -26,6 +26,9 @@ DLL_EXPORTS  int  clInitialKernelAPI()
 	if(0 != clGetCode("F:/Samuel/library_samuel/modules/OCLLibrary/inc/utilities_kernel.cl", sourceCode, &offset))
 		goto exit;
 
+	if(0 != clGetCode("F:/Samuel/library_samuel/modules/OCLLibrary/inc/fft_kernel.cl", sourceCode, &offset))
+		goto exit;
+
 	if(0 != clIntialEnviroment(sourceCode, NULL, NULL ,NULL))
 		goto exit;
 
@@ -72,6 +75,12 @@ static int clCreateKetnelFunc(KERNEL_API *kernel_API)
 	kernel_API->g_ZeroMemory_kernel4         = clCreateKernel(cp, "zeroMemory_kernel4",         &status);
 	//transpose
 	kernel_API->g_Transpose_kernel           = clCreateKernel(cp, "transpose_kernel"  ,         &status);
+
+	//FFT
+	kernel_API->g_FFT_1D_R2C_kernel          = clCreateKernel(cp, "fft_1D_R2C_kernel"  ,        &status);
+	kernel_API->g_FFT_2D_R2C_kernel          = clCreateKernel(cp, "fft_2D_R2C_kernel"  ,        &status);	
+	kernel_API->g_FFT_2D_C2C_kernel          = clCreateKernel(cp, "fft_2D_C2C_kernel"  ,        &status);
+	kernel_API->g_FFT_2D_C2R_kernel          = clCreateKernel(cp, "fft_2D_C2R_kernel"  ,        &status);
 	return status;
 }
 
@@ -91,6 +100,10 @@ static int clReleaseKetnelFunc(KERNEL_API *kernel_API)
 	status = clReleaseKernel(kernel_API->g_ZeroMemory_kernel2);
 	status = clReleaseKernel(kernel_API->g_ZeroMemory_kernel4);
 	status = clReleaseKernel(kernel_API->g_Transpose_kernel);
+	status = clReleaseKernel(kernel_API->g_FFT_1D_R2C_kernel);
+	status = clReleaseKernel(kernel_API->g_FFT_2D_R2C_kernel);
+	status = clReleaseKernel(kernel_API->g_FFT_2D_C2C_kernel);
+	status = clReleaseKernel(kernel_API->g_FFT_2D_C2R_kernel);
 	return status;
 }
 

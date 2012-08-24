@@ -15,6 +15,12 @@ typedef struct _KERNEL_API_
 	cl_kernel  g_ZeroMemory_kernel4;
 	//transpose
 	cl_kernel  g_Transpose_kernel;
+
+	//fft
+	cl_kernel  g_FFT_1D_R2C_kernel;
+	cl_kernel  g_FFT_2D_R2C_kernel;
+	cl_kernel  g_FFT_2D_C2C_kernel;
+	cl_kernel  g_FFT_2D_C2R_kernel;
 }KERNEL_API;
 
 extern KERNEL_API kernelAPI;

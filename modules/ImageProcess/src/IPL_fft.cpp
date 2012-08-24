@@ -69,7 +69,7 @@ DLL_EXPORTS   int  IDFT_1D(complex_t *src, double *dst, int N)
     
     if ((NULL == src) || (NULL == dst))
         EXIT;
-    N_2 = N / 2;
+    N_2 = N >>1;
 
     MM_MemSet(dst,0, sizeof(*dst)*N);
     for (i=0; i<N; i++)
@@ -96,17 +96,21 @@ DLL_EXPORTS   int  IDFT_1D(complex_t *src, double *dst, int N)
     return status;
 }
 
-DLL_EXPORTS int FFT_1D(double *src, complex_t *dst, int N)
+// use sqrt replace the sin cos operating
+DLL_EXPORTS int FFT_1D_t(double *src, complex_t *dst, int N)
 {
+	int status = -1;
     int num, num2, i,j,k,l, i1,l1,l2;
     double c1,c2,t1,t2,u1,u2, z;
 
+	__SAM_BEGIN__;
+
     if ((NULL == src) || (NULL == dst))
-        return -1;
+        EXIT;
     /* Calculate the number of points */
     num = 1;
     for (i=0;i<N;i++) 
-        num *= 2;
+        num <<= 1;
 
     /* Do the bit reversal */
     num2 = num >> 1;
@@ -170,20 +174,25 @@ DLL_EXPORTS int FFT_1D(double *src, complex_t *dst, int N)
         dst[i].real /= num;
 	dst[i].imaginary /= num;
     }
-    return  0;
+
+    status = 0;
+    __SAM_END__;
+    return status;
 }
 
-DLL_EXPORTS  int FFT_1D_1(double *src, complex_t *dst, int N)
+DLL_EXPORTS  int FFT_R2C_1D(double *src, complex_t *dst, int N)
 {
+	int status = -1;
     int m,i,j,k, num,num2, le, lei, ip;;
     double t1,t2, c1,c2, u1,u2, z;
     
+	__SAM_BEGIN__;
     if ((NULL == src) || (NULL == dst))
-        return -1;
+        EXIT;
 
     num = 1;
     for (i=0;i<N;i++) 
-        num *= 2;
+        num <<= 1;
 
     /* Do the bit reversal */
     num2 = num >> 1;
@@ -211,9 +220,7 @@ DLL_EXPORTS  int FFT_1D_1(double *src, complex_t *dst, int N)
 	}
 	j += k;
     }
-
-    
-
+	
     for(m=1; m<=N; m++)
     {
         le = 2<<(m-1);
@@ -246,6 +253,132 @@ DLL_EXPORTS  int FFT_1D_1(double *src, complex_t *dst, int N)
         dst[i].real /= num;
 	dst[i].imaginary /= num;
     }
-    return 0;
+    status = 0;
+    __SAM_END__;
+    return status;
 }
-//DLL_EXPORTS  int  IFFT_1D(complex_t *src, double *dst, int N);
+
+DLL_EXPORTS  int FFT_C2C_1D(complex_t *src, complex_t *dst, int N, int dir)
+{
+	int status = -1;
+    int m,i,j,k, num,num2, le, lei, ip;;
+    double t1,t2, c1,c2, u1,u2, z;
+
+	__SAM_BEGIN__;
+    if ((NULL == src) || (NULL == dst))
+        EXIT;
+
+    num = 1;
+    for (i=0;i<N;i++) 
+        num <<= 1;
+
+    /* Do the bit reversal */
+    num2 = num >> 1;
+    j = 0;
+
+    for (i=0;i<num;i++) 
+	    dst[i]=src[i];
+
+    //Rader algorithm
+    for (i=0;i<num-1;i++)
+    {
+        if (i < j)
+	{
+	    dst[i] = src[j];
+	    dst[j] = src[i];	
+	}
+	k = num2;
+	while (k <= j) 
+	{
+	    j -= k;
+	    k >>= 1;
+	}
+	j += k;
+    }
+	
+    for(m=1; m<=N; m++)
+    {
+        le = 2<<(m-1);
+	lei = le/2;
+	u1 = 1.0;
+	u2 = 0.0;
+	c1 = cos(PI_T/lei);
+	c2 = -sin(PI_T/lei);
+	
+	for(j=0; j<lei; j++)
+	{
+	    for(i=j; i<num; i+=le)
+	    {
+	        ip = i+lei;		
+		t1 = u1 * dst[ip].real - u2 * dst[ip].imaginary;
+		t2 = u1 * dst[ip].imaginary + u2 * dst[ip].real;
+		dst[ip].real = dst[i].real - t1; 
+		dst[ip].imaginary = dst[i].imaginary - t2;
+		dst[i].real += t1;
+		dst[i].imaginary += t2;
+	    }
+	    z  = u1 * c1 - u2 * c2;
+	    u2 = u1 * c2 + u2 * c1;
+	    u1 = z;
+	}
+
+    }
+    for (i=0;i<num;i++)
+    {
+        dst[i].real /= num;
+	dst[i].imaginary /= num;
+    }
+    status = 0;
+    __SAM_END__;
+    return status;
+}
+
+DLL_EXPORTS  int  FFT_2D(double *src, complex_t *dst, int N_x, int N_y)
+{
+	int status = -1;
+	int i, j, num_x=1, num_y=1;
+	complex_t *temp = NULL;
+
+	__SAM_BEGIN__;
+	if ((NULL == src) || (NULL == dst))
+		EXIT;
+
+	for (i=0;i<N_x;i++) 
+        num_x <<= 1;
+	for (i=0;i<N_y;i++) 
+        num_y <<= 1;
+
+	temp = (complex_t *)MM_MemAlloc(NULL, num_x*num_y*sizeof(complex_t));
+	if(NULL == temp)
+		EXIT;
+
+	for(i=0; i<num_y; i++)
+		FFT_R2C_1D(src+i*num_x, temp+i*num_x, N_x);
+
+	//transpose
+	for(i=0; i<num_y; i++)
+	{
+		for(j=0; j<num_x; j++)
+		{
+			dst[j*num_y + i] = temp[i*num_x + j];
+		}
+	}
+
+	for(i=0; i<num_y; i++)
+		FFT_C2C_1D(dst+i*num_y, temp+i*num_y, N_y, 1);
+
+	//transpose
+	for(i=0; i<num_x; i++)
+	{
+		for(j=0; j<num_y; j++)
+		{
+			dst[j*num_x + i]= temp[i*num_y + j] ;
+		}
+	}
+	
+	status = 0;
+    __SAM_END__;
+	if(NULL != temp)MM_MemFree(NULL, (void**)(&temp));
+    return status;
+
+}
