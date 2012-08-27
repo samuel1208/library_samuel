@@ -257,6 +257,86 @@ DLL_EXPORTS  int FFT_R2C_1D(double *src, complex_t *dst, int N)
     __SAM_END__;
     return status;
 }
+DLL_EXPORTS  int  FFT_C2R_1D(complex_t *src, double *dst, int N)
+{
+    int status = -1;
+    int m,i,j,k, num,num2, le, lei, ip;;
+    double t1,t2, c1,c2, u1,u2, z;
+	complex_t *_dst = NULL;
+    
+	__SAM_BEGIN__;
+    if ((NULL == src) || (NULL == dst))
+        EXIT;
+
+    num = 1;
+    for (i=0;i<N;i++) 
+        num <<= 1;
+
+    /* Do the bit reversal */
+    num2 = num >> 1;
+    j = 0;
+
+	_dst = (complex_t*) MM_MemAlloc(NULL, num*sizeof(complex_t));
+
+	if(NULL == _dst)
+		EXIT;
+
+	MM_MemCpy(src, _dst, num*sizeof(complex_t));
+
+
+    //Rader algorithm
+    for (i=0;i<num-1;i++)
+    {
+        if (i < j)
+	{
+	    _dst[i] = src[j];
+	    _dst[j] = src[i];	
+	}
+	k = num2;
+	while (k <= j) 
+	{
+	    j -= k;
+	    k >>= 1;
+	}
+	j += k;
+    }
+	
+    for(m=1; m<=N; m++)
+    {
+        le = 2<<(m-1);
+	lei = le/2;
+	u1 = 1.0;
+	u2 = 0.0;
+	c1 = cos(PI_T/lei);
+	c2 = sin(PI_T/lei);
+	
+	for(j=0; j<lei; j++)
+	{
+	    for(i=j; i<num; i+=le)
+	    {
+	        ip = i+lei;		
+		t1 = u1 * _dst[ip].real - u2 * _dst[ip].imaginary;
+		t2 = u1 * _dst[ip].imaginary + u2 * _dst[ip].real;
+		_dst[ip].real = _dst[i].real - t1; 
+		_dst[ip].imaginary = _dst[i].imaginary - t2;
+		_dst[i].real += t1;
+		_dst[i].imaginary += t2;
+	    }
+	    z  = u1 * c1 - u2 * c2;
+	    u2 = u1 * c2 + u2 * c1;
+	    u1 = z;
+	}
+
+    }
+    for (i=0;i<num;i++)
+    {
+        dst[i] = _dst[i].real;
+    }
+    status = 0;
+    __SAM_END__;
+	if(_dst) MM_MemFree(NULL, (void**)&_dst);
+    return status;
+}
 
 DLL_EXPORTS  int FFT_C2C_1D(complex_t *src, complex_t *dst, int N, int dir)
 {
@@ -265,7 +345,7 @@ DLL_EXPORTS  int FFT_C2C_1D(complex_t *src, complex_t *dst, int N, int dir)
     double t1,t2, c1,c2, u1,u2, z;
 
 	__SAM_BEGIN__;
-    if ((NULL == src) || (NULL == dst))
+    if ((NULL == src) || (NULL == dst) || (1 != dir*dir))
         EXIT;
 
     num = 1;
@@ -303,7 +383,7 @@ DLL_EXPORTS  int FFT_C2C_1D(complex_t *src, complex_t *dst, int N, int dir)
 	u1 = 1.0;
 	u2 = 0.0;
 	c1 = cos(PI_T/lei);
-	c2 = -sin(PI_T/lei);
+	c2 = -sin(PI_T/lei)*dir;
 	
 	for(j=0; j<lei; j++)
 	{
@@ -323,11 +403,14 @@ DLL_EXPORTS  int FFT_C2C_1D(complex_t *src, complex_t *dst, int N, int dir)
 	}
 
     }
-    for (i=0;i<num;i++)
-    {
-        dst[i].real /= num;
-	dst[i].imaginary /= num;
-    }
+	if(1==dir)
+	{
+		for (i=0;i<num;i++)
+		{
+			dst[i].real /= num;
+			dst[i].imaginary /= num;
+		}
+	}
     status = 0;
     __SAM_END__;
     return status;
@@ -379,6 +462,59 @@ DLL_EXPORTS  int  FFT_2D(double *src, complex_t *dst, int N_x, int N_y)
 	status = 0;
     __SAM_END__;
 	if(NULL != temp)MM_MemFree(NULL, (void**)(&temp));
+    return status;
+
+}
+DLL_EXPORTS  int  IFFT_2D(complex_t *src, double *dst, int N_x, int N_y)
+{
+	int status = -1;
+	int i, j, num_x=1, num_y=1;
+	complex_t *temp0 = NULL,  *temp1=NULL;
+	double *temp2 = NULL;
+
+	__SAM_BEGIN__;
+	if ((NULL == src) || (NULL == dst))
+		EXIT;
+
+	for (i=0;i<N_x;i++) 
+        num_x <<= 1;
+	for (i=0;i<N_y;i++) 
+        num_y <<= 1;
+
+	temp0 = (complex_t *)MM_MemAlloc(NULL, num_x*num_y*sizeof(complex_t));
+	temp1 = (complex_t *)MM_MemAlloc(NULL, num_x*num_y*sizeof(complex_t));
+	temp2 = (double *)MM_MemAlloc(NULL, num_x*num_y*sizeof(double));
+	if ((NULL == temp0) || (NULL == temp1) || (NULL == temp2))
+		EXIT;
+
+	for(i=0; i<num_y; i++)
+		FFT_C2C_1D(src+i*num_x, temp0+i*num_x, N_x, -1);
+	//transpose
+	for(i=0; i<num_y; i++)
+	{
+		for(j=0; j<num_x; j++)
+		{
+			temp1[j*num_y + i] = temp0[i*num_x + j];
+		}
+	}
+
+	for(i=0; i<num_y; i++)
+		FFT_C2R_1D(temp1+i*num_y, temp2+i*num_y, N_y);
+
+	//transpose
+	for(i=0; i<num_x; i++)
+	{
+		for(j=0; j<num_y; j++)
+		{
+			dst[j*num_x + i]= temp2[i*num_y + j] ;
+		}
+	}
+	
+	status = 0;
+    __SAM_END__;
+	if(NULL != temp0)MM_MemFree(NULL, (void**)(&temp0));
+	if(NULL != temp1)MM_MemFree(NULL, (void**)(&temp1));
+	if(NULL != temp2)MM_MemFree(NULL, (void**)(&temp2));
     return status;
 
 }

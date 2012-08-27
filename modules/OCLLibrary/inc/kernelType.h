@@ -18,6 +18,7 @@ typedef struct _KERNEL_API_
 
 	//fft
 	cl_kernel  g_FFT_1D_R2C_kernel;
+	cl_kernel  g_FFT_1D_C2R_kernel;
 	cl_kernel  g_FFT_2D_R2C_kernel;
 	cl_kernel  g_FFT_2D_C2C_kernel;
 	cl_kernel  g_FFT_2D_C2R_kernel;

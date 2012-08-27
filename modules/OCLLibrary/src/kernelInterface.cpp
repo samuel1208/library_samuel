@@ -78,6 +78,7 @@ static int clCreateKetnelFunc(KERNEL_API *kernel_API)
 
 	//FFT
 	kernel_API->g_FFT_1D_R2C_kernel          = clCreateKernel(cp, "fft_1D_R2C_kernel"  ,        &status);
+	kernel_API->g_FFT_1D_C2R_kernel          = clCreateKernel(cp, "fft_1D_C2R_kernel"  ,        &status);
 	kernel_API->g_FFT_2D_R2C_kernel          = clCreateKernel(cp, "fft_2D_R2C_kernel"  ,        &status);	
 	kernel_API->g_FFT_2D_C2C_kernel          = clCreateKernel(cp, "fft_2D_C2C_kernel"  ,        &status);
 	kernel_API->g_FFT_2D_C2R_kernel          = clCreateKernel(cp, "fft_2D_C2R_kernel"  ,        &status);
@@ -101,6 +102,7 @@ static int clReleaseKetnelFunc(KERNEL_API *kernel_API)
 	status = clReleaseKernel(kernel_API->g_ZeroMemory_kernel4);
 	status = clReleaseKernel(kernel_API->g_Transpose_kernel);
 	status = clReleaseKernel(kernel_API->g_FFT_1D_R2C_kernel);
+	status = clReleaseKernel(kernel_API->g_FFT_1D_C2R_kernel);
 	status = clReleaseKernel(kernel_API->g_FFT_2D_R2C_kernel);
 	status = clReleaseKernel(kernel_API->g_FFT_2D_C2C_kernel);
 	status = clReleaseKernel(kernel_API->g_FFT_2D_C2R_kernel);

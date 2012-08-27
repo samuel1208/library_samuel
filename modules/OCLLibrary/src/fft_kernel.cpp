@@ -14,13 +14,20 @@ DLL_EXPORTS  int  FFT_1D_OCL(cl_mem src,  cl_mem dst, int N, int sign, cl_event 
 	cl_int  status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
+	cl_kernel kernel = NULL;
+	cl_command_queue  cq  = GetOclCommandQueue();
 
 	int num=1, i=0;
 	for (i=0;i<N;i++) 
         num <<= 1;
+		
+	if(1 == sign)
+		kernel = kernelAPI.g_FFT_1D_R2C_kernel;
+	else if ( -1 == sign)
+		kernel = kernelAPI.g_FFT_1D_C2R_kernel;
+	else 
+		return status;
 
-	cl_command_queue  cq  = GetOclCommandQueue();
-	cl_kernel kernel = kernelAPI.g_FFT_1D_R2C_kernel;
 
 	// block size
 	threadsInBlock[0] = num;
