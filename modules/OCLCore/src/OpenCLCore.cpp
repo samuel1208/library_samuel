@@ -197,11 +197,12 @@ DLL_EXPORTS  int  clMemFree(void **mem)
 }
 
 //initialize OPENCL  environment 
+
 static cl_int clInitialize(cl_context ct, cl_command_queue cq, cl_device_id cd)
 {
 	cl_int	status = -1;
 	unsigned int i=0;
-
+	
 	//initialize the OCL envrioment  outside
 	if (NULL != cd)
 	{
@@ -233,8 +234,20 @@ static cl_int clInitialize(cl_context ct, cl_command_queue cq, cl_device_id cd)
 		cl_platform_id*	platformId = new cl_platform_id[platformNum];
 	    status = clGetPlatformIDs(platformNum, platformId, 0);
 		if (CL_SUCCESS != status)
+		{
+			if(platformId) delete[] platformId;
 			return status;
-
+		}
+		//printf the platform info
+		//{
+		//	//int num=0; char *str = NULL;
+		//	//clGetPlatformInfo (platformId[0], CL_PLATFORM_NAME,0, NULL, (size_t *)&num);
+		//	//str = new char[num+1];
+		//	//clGetPlatformInfo (platformId[0], CL_PLATFORM_NAME,num, str, NULL);
+		//	//printf("%s", str);
+		//	//delete[] str;
+		//	//return -1;
+		//}
 		//get GPU device 
 		for(i=0; i<platformNum; i++)
 		{
@@ -243,17 +256,27 @@ static cl_int clInitialize(cl_context ct, cl_command_queue cq, cl_device_id cd)
 				break;
 		}
 		if(CL_SUCCESS != status)
+		{
+			if(platformId) delete[] platformId;
 			return status;
+		}
 
 		//create the context
 		ocl_core[0].g_CLContext = clCreateContext(0, 1, &(ocl_core[0].g_CLDevices), NULL, NULL, &status);
 		if (CL_SUCCESS != status)
+		{
+			if(platformId) delete[] platformId;
 			return status;
+		}
 
 		//create the command
 		ocl_core[0].g_CLCommandQueue = clCreateCommandQueue(ocl_core[0].g_CLContext, ocl_core[0].g_CLDevices, 0, &status);
 		if (CL_SUCCESS != status)
+		{
+			if(platformId) delete[] platformId;
 			return status;
+		}
+		if(platformId) delete[] platformId;
 	}	
 	status = 0;
 	return status;

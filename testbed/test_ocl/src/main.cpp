@@ -72,12 +72,11 @@ int main(int argc, char **argv)
 		     c_data[i*N + j] = i*N + j+1024;		
 	}
     status = clInitialKernelAPI();
-		
+	return -1;
 	status = clMallocBuf((void**)(&g_data),N*N*sizeof(double));
 	status = clMallocBuf((void**)(&g_result),N*N*2*sizeof(double));
 	status = clMallocBuf((void**)(&g_Iresult),N*N*sizeof(double));
 	status = clMallocBuf((void**)(&g_temp),N*N*2*sizeof(double));
-
 	status = clMemcpyBuf((void**)(&c_data),(void**)(&g_data),N*N*sizeof(double), clMemcpyHostToDevice);
 	//GPU 1D FFT 
 	time_stamp(0, NULL);

@@ -26,7 +26,6 @@ macro(define_module module)
 endmacro(define_module)
 
 #the include files 
-include_directories(../common/include)
 include_directories(./SamCore/inc)
 
 #generate the MMange library

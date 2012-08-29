@@ -27,9 +27,15 @@ message("\n------------------------------------")
 message("The OpenCV path is as follow:")
 message(${OpenCV_LIB_DIR})
 message("------------------------------------\n")
+message("path\n")
+#set(ENV{PATH} "/F/Samuel/library_samuel/common/bin/")
+message($ENV{PATH})
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
+
+include_directories(./common/inc)
+link_directories(./common/lib/)
 
 add_subdirectory(modules)
 add_subdirectory(testbed)
