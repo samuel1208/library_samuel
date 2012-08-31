@@ -4,8 +4,8 @@ import os
 def IsPython3Check() :
     print("OS Version: %s"%(os.name))
     print("Python version: %s"%(sys.version[0:6]))
-    IsPython3 = (sys.version[0] == '3')
+    IsPython3 = sys.version[0] 
     return IsPython3
 
 ###default is tuple
-IsPython3 = tuple([IsPython3Check()])
+IsPython3 = IsPython3Check()

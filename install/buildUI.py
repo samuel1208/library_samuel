@@ -4,11 +4,12 @@ import sys
 import subprocess
 
 IsPython3 = version.IsPython3
+print(IsPython3)
 
-if  IsPython3 :
+if  "3" == IsPython3 :
     #from  tkinter import  tkinter
     from  tkinter  import *
-else :
+elif "2" == IsPython3:
     from  Tkinter  import *
 
 __metaclass__ = type
