@@ -30,7 +30,8 @@ include_directories(../modules/SamCore/inc)
 include_directories(../modules/ImageProcess/inc)
 add_subdirectory(test)
 if(OGL_ENABLE)
-add_subdirectory(test_ogl)
+    add_subdirectory(test_ogl)
+endif()
 
 
 #generate the testbeds
