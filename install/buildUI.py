@@ -4,7 +4,6 @@ import sys
 import subprocess
 
 IsPython3 = version.IsPython3
-print(IsPython3)
 
 if  "3" == IsPython3 :
     #from  tkinter import  tkinter
