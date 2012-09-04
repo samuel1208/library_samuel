@@ -2,13 +2,16 @@
 #include "utilities_API.h"
 #include "kernelType.h"
 
-DLL_EXPORTS  int  ZeroMemory_OCL(cl_mem data, int dataSize,cl_event *ev)
+DLL_EXPORTS  int  ZeroMemory_OCL(cl_mem data, int dataSize, 
+	                             cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	cl_int  status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 	cl_kernel kernel = NULL;
-		cl_command_queue  cq  = GetOclCommandQueue();
+
+	if(NULL == cq)
+		cl_command_queue  cq  = GetOclCommandQueue0();
 	if (0 == (dataSize%4))
 	{
 		dataSize /= 4;
@@ -32,8 +35,7 @@ DLL_EXPORTS  int  ZeroMemory_OCL(cl_mem data, int dataSize,cl_event *ev)
 	threadsInBlock[0] = 256;
 	total_threads[0] = (dataSize+threadsInBlock[0]-1)/threadsInBlock[0]*threadsInBlock[0];
 
-	status= clEnqueueNDRangeKernel( cq , kernel , 1 , NULL , total_threads , threadsInBlock , 0 , NULL , ev );
-
+	status= clEnqueueNDRangeKernel(cq, kernel, 1, NULL, total_threads, threadsInBlock, ev_num, ev_wait, ev);
 	return status;
 }
 
@@ -41,13 +43,15 @@ DLL_EXPORTS  int  ZeroMemory_OCL(cl_mem data, int dataSize,cl_event *ev)
                         Statistic the histogram
 1.only uchar type data  2.histData must be set to 0(should change)
 *********************************************************************/
-DLL_EXPORTS  int  HistogramStatistics_OCL(cl_mem srcData, cl_mem  histData, int dataSize,cl_event *ev)
+DLL_EXPORTS  int  HistogramStatistics_OCL(cl_mem srcData, cl_mem  histData, int dataSize,
+	                                      cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	cl_int  status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 
-	cl_command_queue  cq  = GetOclCommandQueue();
+	if(NULL == cq)
+		cq  = GetOclCommandQueue0();
 	cl_kernel kernel = kernelAPI.g_HistogramStatistics_kernel;
 
 	// block size
@@ -63,8 +67,7 @@ DLL_EXPORTS  int  HistogramStatistics_OCL(cl_mem srcData, cl_mem  histData, int 
 	if( CL_SUCCESS!= status )
 		return status;
 
-	status= clEnqueueNDRangeKernel( cq , kernel , 1 , NULL , total_threads , threadsInBlock , 0 , NULL , ev );
-
+	status= clEnqueueNDRangeKernel(cq, kernel, 1, NULL, total_threads, threadsInBlock, ev_num, ev_wait, ev);
 	return status;
 }
 
@@ -73,13 +76,15 @@ DLL_EXPORTS  int  HistogramStatistics_OCL(cl_mem srcData, cl_mem  histData, int 
 blockSize=256. each block process 512 elements , data's type is int
 *********************************************************************/
 //
-static  int  Reduction_Min_kernel(cl_mem g_idata, cl_mem g_odata, int dataSize, cl_event *ev)
+static  int  Reduction_Min_kernel(cl_mem g_idata, cl_mem g_odata, int dataSize,
+	                              cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	cl_int  status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 
-	cl_command_queue  cq  = GetOclCommandQueue();
+	if(NULL == cq)
+	    cq  = GetOclCommandQueue0();
 	cl_kernel kernel = kernelAPI.g_Reduction_Min_kernel;
 
 	//block size
@@ -95,13 +100,14 @@ static  int  Reduction_Min_kernel(cl_mem g_idata, cl_mem g_odata, int dataSize, 
 	if( CL_SUCCESS!= status )
 		return status;
 
-	status= clEnqueueNDRangeKernel( cq , kernel , 1 , NULL , total_threads , threadsInBlock , 0 , NULL , ev );
+	status= clEnqueueNDRangeKernel(cq, kernel, 1, NULL, total_threads, threadsInBlock, ev_num, ev_wait, ev);
 
 	return status;
 }
 
 //the max data size is 512*512
-DLL_EXPORTS  int  Reduction_Min_OCL(cl_mem g_idata, cl_mem g_temp, cl_mem g_odata, int dataSize, cl_event *ev)
+DLL_EXPORTS  int  Reduction_Min_OCL(cl_mem g_idata, cl_mem g_temp, cl_mem g_odata, int dataSize,
+	                                cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	int status = -1;
 
@@ -109,11 +115,11 @@ DLL_EXPORTS  int  Reduction_Min_OCL(cl_mem g_idata, cl_mem g_temp, cl_mem g_odat
 		status = -1;
 	else if (dataSize > 512)
 	{
-		status = Reduction_Min_kernel(g_idata, g_temp, dataSize, ev);
-		status = Reduction_Min_kernel(g_temp, g_odata, (dataSize+511)/512,ev);
+		status = Reduction_Min_kernel(g_idata, g_temp, dataSize, cq, ev_num, ev_wait, ev);
+		status = Reduction_Min_kernel(g_temp, g_odata, (dataSize+511)/512, cq, ev_num, ev_wait, ev);
 	}
 	else 
-		status = Reduction_Min_kernel(g_idata, g_odata, dataSize, ev);
+		status = Reduction_Min_kernel(g_idata, g_odata, dataSize, cq, ev_num, ev_wait, ev);
 
 	return status;
 }
@@ -121,13 +127,15 @@ DLL_EXPORTS  int  Reduction_Min_OCL(cl_mem g_idata, cl_mem g_temp, cl_mem g_odat
 /********************************************************************
                                scan
 *********************************************************************/
-static int scanExclusive_Kernel(cl_mem g_idata,  cl_mem g_odata, cl_mem g_blockSum, int arrayNum, cl_event *ev)
+static int scanExclusive_Kernel(cl_mem g_idata,  cl_mem g_odata, cl_mem g_blockSum, int arrayNum,
+	                            cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	int     status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 
-	cl_command_queue  cq  = GetOclCommandQueue();
+	if(NULL == cq)
+	    cq  = GetOclCommandQueue0();
 	cl_kernel kernel = kernelAPI.g_Scan_Exclusive_Kernel;
 
 	//block size	
@@ -143,17 +151,19 @@ static int scanExclusive_Kernel(cl_mem g_idata,  cl_mem g_odata, cl_mem g_blockS
 	if( CL_SUCCESS!= status )
 		return status;
 
-	status = clEnqueueNDRangeKernel( cq , kernel , 1 , 0 , total_threads , threadsInBlock , 0 , NULL , ev );
+	status = clEnqueueNDRangeKernel(cq, kernel, 1, 0, total_threads, threadsInBlock, ev_num, ev_wait, ev);
 	return status;
 }
 
-static  int  uniformAdd_Kernel(cl_mem  g_data, cl_mem  uniforms, int arrayNum, cl_event *ev)
+static  int  uniformAdd_Kernel(cl_mem  g_data, cl_mem  uniforms, int arrayNum,
+	                           cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	int     status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 
-	cl_command_queue  cq  = GetOclCommandQueue();
+	if(NULL == cq)
+	    cq  = GetOclCommandQueue0();
 	cl_kernel kernel = kernelAPI.g_UniformAdd_Kernel;
 
 	//block size
@@ -166,11 +176,12 @@ static  int  uniformAdd_Kernel(cl_mem  g_data, cl_mem  uniforms, int arrayNum, c
     if( CL_SUCCESS!= status )
 		return status;
 	
-	status = clEnqueueNDRangeKernel( cq , kernel , 1 , 0 , total_threads , threadsInBlock , 0 , NULL , ev );
+	status = clEnqueueNDRangeKernel(cq, kernel, 1, 0, total_threads, threadsInBlock, ev_num, ev_wait, ev);
 	return status;
 }
 
-DLL_EXPORTS  int  ScanEexclusive_OCL(cl_mem g_idata, cl_mem  g_odata, int arrayNum, cl_event *ev)
+DLL_EXPORTS  int  ScanEexclusive_OCL(cl_mem g_idata, cl_mem  g_odata, int arrayNum,
+	                                 cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	//the size must samller than the size of memory;
 	int status = -1;
@@ -184,16 +195,16 @@ DLL_EXPORTS  int  ScanEexclusive_OCL(cl_mem g_idata, cl_mem  g_odata, int arrayN
 	if(0 != status)
 		return status;
 
-	status = scanExclusive_Kernel(g_idata, g_odata, g_blockSum1, arrayNum, ev);
+	status = scanExclusive_Kernel(g_idata, g_odata, g_blockSum1, arrayNum, cq, ev_num, ev_wait, ev);
 	if(0 != status)
 		return status;
 	if (sumNum > 1)
 	{
-		status = ScanEexclusive_OCL( g_blockSum1, g_blockSum2,sumNum, ev);
+		status = ScanEexclusive_OCL( g_blockSum1, g_blockSum2, sumNum, cq, ev_num, ev_wait, ev);
 		if(0 != status)
 			return status;
 
-		status = uniformAdd_Kernel( g_odata, g_blockSum2, arrayNum, ev);
+		status = uniformAdd_Kernel( g_odata, g_blockSum2, arrayNum, cq, ev_num, ev_wait, ev);
 		if(0 != status)
 			return status;	
 	}
@@ -206,13 +217,15 @@ DLL_EXPORTS  int  ScanEexclusive_OCL(cl_mem g_idata, cl_mem  g_odata, int arrayN
 /********************************************************************
                                transpose
 *********************************************************************/
-DLL_EXPORTS  int  Transpose_OCL(cl_mem g_idata, cl_mem  g_odata, int width, int height, cl_event *ev)
+DLL_EXPORTS  int  Transpose_OCL(cl_mem g_idata, cl_mem  g_odata, int width, int height,
+	                            cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	int status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 
-	cl_command_queue  cq  = GetOclCommandQueue();
+	if(NULL == cq)
+	    cq  = GetOclCommandQueue0();
 	cl_kernel kernel = kernelAPI.g_Transpose_kernel;
 
 	//block size
@@ -231,7 +244,35 @@ DLL_EXPORTS  int  Transpose_OCL(cl_mem g_idata, cl_mem  g_odata, int width, int 
 	if( CL_SUCCESS!= status )
 		return status;	
 
-	status= clEnqueueNDRangeKernel( cq , kernel , 2 , NULL , total_threads , threadsInBlock , 0 , NULL , ev );
+	status= clEnqueueNDRangeKernel(cq, kernel, 2, 0, total_threads, threadsInBlock, ev_num, ev_wait, ev );
 
 	return status;
+}
+
+DLL_EXPORTS  int  Test_OCL(cl_mem src, cl_mem dst, int length, 
+	                       cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
+{
+	int status = -1;
+	size_t  threadsInBlock[2];
+	size_t  total_threads[2];
+
+	if(NULL == cq)
+	    cq  = GetOclCommandQueue0();
+	cl_kernel kernel = kernelAPI.g_Test_kernel;
+
+	//block size
+	threadsInBlock[0] = 256;
+	total_threads[0] = (length + threadsInBlock[0] - 1) / threadsInBlock[0] * threadsInBlock[0];
+
+	//set kernel argument
+	status = clSetKernelArg( kernel , 0 , sizeof(cl_mem)     , &src);
+	status = clSetKernelArg( kernel , 1 , sizeof(cl_mem)     , &dst);
+	status = clSetKernelArg( kernel , 2 , sizeof(int)        , &length);
+
+	if( CL_SUCCESS!= status )
+		return status;	
+
+	status= clEnqueueNDRangeKernel(cq, kernel, 1, 0, total_threads, threadsInBlock, ev_num, ev_wait, ev );
+	return status;
+
 }

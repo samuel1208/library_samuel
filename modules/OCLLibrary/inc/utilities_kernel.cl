@@ -3,6 +3,19 @@
 #pragma OPENCL EXTENSION  cl_khr_local_int32_extended_atomics : enable
 #pragma OPENCL EXTENSION  cl_khr_global_int32_base_atomics : enable
 #pragma OPENCL EXTENSION  cl_khr_fp64 : enable
+
+__kernel  void  test_kernel(__global int *src, __global int *dst ,int length)
+{
+	uint tId_Gx = get_global_id(0) ;
+	if(tId_Gx < length)
+	{
+		float a = 80000;
+		for(int i=0; i<10000; i++)
+			a *= 0.1f;
+		dst[tId_Gx] = src[tId_Gx]*3/2 + a;
+	}
+}
+
 /***********************************************************************************
                               set memory value with zero 
  ***********************************************************************************/

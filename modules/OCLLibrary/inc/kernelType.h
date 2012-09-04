@@ -3,6 +3,9 @@
 
 typedef struct _KERNEL_API_
 {
+	//for test
+	cl_kernel  g_Test_kernel;
+	//
 	cl_kernel  g_HistogramStatistics_kernel;
 	//reduction
 	cl_kernel  g_Reduction_Min_kernel;

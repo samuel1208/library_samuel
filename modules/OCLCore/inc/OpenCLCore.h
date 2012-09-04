@@ -60,7 +60,10 @@ DLL_EXPORTS  int  clMemcpyBuf(void **src, void **dst,
 							  size_t src_offset = 0, 
 							  size_t dst_offset = 0,
 							  cl_bool sync = CL_TRUE, 
-							  cl_event* ev = NULL);
+							  cl_command_queue cq = NULL,
+							  int      ev_num = 0,
+							  cl_event *ev_wait = NULL,
+							  cl_event *ev = NULL);
 
 //create buffer memory
 DLL_EXPORTS  int  clMallocImg2D(void **img, 
@@ -80,14 +83,18 @@ DLL_EXPORTS  int  clMemcpyImg2D(void **src, void **dst,
 								size_t rowPitch = 0,   //  set the row pitch of CPU buffer
 								size_t bufOffset = 0,
 								cl_bool sync = CL_TRUE ,
-								cl_event* ev = NULL);
+								cl_command_queue cq = NULL,
+							    int      ev_num = 0,
+							    cl_event *ev_wait = NULL,
+							    cl_event *ev = NULL);
 
 //free the buffer memory
 DLL_EXPORTS  int  clMemFree(void **mem);
 
 //get ocl_core para
 DLL_EXPORTS  cl_context			  GetOclContext() ;			//cl context
-DLL_EXPORTS	 cl_command_queue	  GetOclCommandQueue() ;	//cl command queue
+DLL_EXPORTS	 cl_command_queue	  GetOclCommandQueue0() ;	//cl command queue
+DLL_EXPORTS	 cl_command_queue	  GetOclCommandQueue1() ;	//cl command queue
 DLL_EXPORTS  cl_program           GetOclProgram() ;         //cl program
 //
 

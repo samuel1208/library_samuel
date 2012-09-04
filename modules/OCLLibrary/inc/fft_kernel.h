@@ -33,10 +33,12 @@ extern "C" {
     sign = -1 : IFFT    complex to real
 */
 
-DLL_EXPORTS  int  FFT_1D_OCL(cl_mem src,  cl_mem dst, int N, int sign, cl_event *ev);
+DLL_EXPORTS  int  FFT_1D_OCL(cl_mem src,  cl_mem dst, int N, int sign,
+	                         cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev);
 
 
-DLL_EXPORTS  int  FFT_2D_OCL(cl_mem src,  cl_mem dst, cl_mem temp, int N_x, int N_y, int sign,  cl_event *ev);
+DLL_EXPORTS  int  FFT_2D_OCL(cl_mem src,  cl_mem dst, cl_mem temp, int N_x, int N_y, int sign, 
+	                         cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev);
 
 #ifdef __cplusplus
 }

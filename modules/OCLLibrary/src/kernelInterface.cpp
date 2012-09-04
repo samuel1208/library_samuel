@@ -65,6 +65,7 @@ static int clCreateKetnelFunc(KERNEL_API *kernel_API)
 		return status;
 
 	//create the function
+	kernel_API->g_Test_kernel                = clCreateKernel(cp, "test_kernel", &status);
 	kernel_API->g_HistogramStatistics_kernel = clCreateKernel(cp, "histogramStatistics_kernel", &status);
 	kernel_API->g_Reduction_Min_kernel       = clCreateKernel(cp, "reduction_Min_kernel",       &status);
 	kernel_API->g_Scan_Exclusive_Kernel      = clCreateKernel(cp, "scan_Exclusive_Kernel",      &status);

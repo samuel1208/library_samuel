@@ -9,13 +9,15 @@ enum FFT_TYPE
 	FFT_C2R = 2,
 };
 
-DLL_EXPORTS  int  FFT_1D_OCL(cl_mem src,  cl_mem dst, int N, int sign, cl_event *ev)
+DLL_EXPORTS  int  FFT_1D_OCL(cl_mem src,  cl_mem dst, int N, int sign, 
+	                         cl_command_queue  cq, int ev_num, cl_event *ev_wait, cl_event *ev)
 {
 	cl_int  status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 	cl_kernel kernel = NULL;
-	cl_command_queue  cq  = GetOclCommandQueue();
+	if (NULL == cq)
+		cq  = GetOclCommandQueue0();
 
 	int num=1, i=0;
 	for (i=0;i<N;i++) 
@@ -43,7 +45,7 @@ DLL_EXPORTS  int  FFT_1D_OCL(cl_mem src,  cl_mem dst, int N, int sign, cl_event 
 	if( CL_SUCCESS!= status )
 		return status;
 
-	status= clEnqueueNDRangeKernel( cq , kernel , 1 , NULL , total_threads , threadsInBlock , 0 , NULL , ev );
+	status= clEnqueueNDRangeKernel( cq , kernel , 1 , NULL , total_threads , threadsInBlock , ev_num, ev_wait, ev);
 
 	return status;
 }
@@ -51,16 +53,16 @@ DLL_EXPORTS  int  FFT_1D_OCL(cl_mem src,  cl_mem dst, int N, int sign, cl_event 
 /*
     X direction operate 1D FFT
 */
-static  int  FFT_2D_X_kernel(cl_mem src,  cl_mem dst, int N, int num_x, int num_y, FFT_TYPE fft_type, int sign, cl_event *ev)
+static  int  FFT_2D_X_kernel(cl_mem src,  cl_mem dst, int N, int num_x, int num_y, FFT_TYPE fft_type, int sign, 
+	                         cl_command_queue cq, int ev_num, cl_event* ev_wait, cl_event *ev)
 {
 	cl_int  status = -1;
 	size_t  threadsInBlock[2];
 	size_t  total_threads[2];
 	cl_kernel kernel = NULL;
 
-
-
-	cl_command_queue  cq  = GetOclCommandQueue();
+	if (NULL == cq)
+		cq  = GetOclCommandQueue0();
 	switch(fft_type )
 	{
 	case FFT_R2C :
@@ -98,12 +100,13 @@ static  int  FFT_2D_X_kernel(cl_mem src,  cl_mem dst, int N, int num_x, int num_
 	if( CL_SUCCESS!= status )
 		return status;
 
-	status= clEnqueueNDRangeKernel( cq , kernel , 1 , NULL , total_threads , threadsInBlock , 0 , NULL , ev );
+	status= clEnqueueNDRangeKernel( cq , kernel , 1 , NULL , total_threads , threadsInBlock , ev_num , ev_wait , ev );
 
 	return status;
 }
 
-DLL_EXPORTS  int  FFT_2D_OCL(cl_mem src,  cl_mem dst, cl_mem temp, int N_x, int N_y, int sign, cl_event *ev)
+DLL_EXPORTS  int  FFT_2D_OCL(cl_mem src,  cl_mem dst, cl_mem temp, int N_x, int N_y, int sign,
+	                         cl_command_queue cq, int ev_num, cl_event* ev_wait, cl_event *ev)
 {
 	cl_int  status = -1;
 
@@ -116,13 +119,13 @@ DLL_EXPORTS  int  FFT_2D_OCL(cl_mem src,  cl_mem dst, cl_mem temp, int N_x, int 
 	//do transpose in the kernel, the global writing is not merge,  
 	if(1 == sign)
 	{
-		status = FFT_2D_X_kernel(src, temp, N_x, num_x, num_y, FFT_R2C, 1 , NULL);
-		status = FFT_2D_X_kernel(temp, dst, N_y, num_y, num_x, FFT_C2C, 1 , NULL);
+		status = FFT_2D_X_kernel(src, temp, N_x, num_x, num_y, FFT_R2C, 1, cq, ev_num, ev_wait, ev);
+		status = FFT_2D_X_kernel(temp, dst, N_y, num_y, num_x, FFT_C2C, 1, cq, ev_num, ev_wait, ev);
 	}
 	else if(-1 == sign)
 	{
-		status = FFT_2D_X_kernel(src, temp, N_x, num_x, num_y, FFT_C2C, -1 , NULL);
-		status = FFT_2D_X_kernel(temp, dst, N_y, num_y, num_x, FFT_C2R, -1 , NULL);		
+		status = FFT_2D_X_kernel(src, temp, N_x, num_x, num_y, FFT_C2C, -1, cq, ev_num, ev_wait, ev);
+		status = FFT_2D_X_kernel(temp, dst, N_y, num_y, num_x, FFT_C2R, -1, cq, ev_num, ev_wait, ev);		
 	}
 	return status;
 }

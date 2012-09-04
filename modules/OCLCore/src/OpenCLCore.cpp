@@ -9,7 +9,8 @@ typedef struct _OCL_CORE_
 	cl_context			  g_CLContext ;			//cl context
 	cl_device_id 		  g_CLDevices ;		    //cl devices
 	size_t				  g_CLDeviceListSize  ;	//cl device size list
-	cl_command_queue	  g_CLCommandQueue ;	//cl command queue
+	cl_command_queue	  g_CLCommandQueue0 ;	//cl command queue0
+    cl_command_queue	  g_CLCommandQueue1 ;	//cl command queue1
 	cl_program            g_CLProgram ;         //cl program
 } OCL_CORE;
 /************************************************************************************/
@@ -54,9 +55,13 @@ DLL_EXPORTS  cl_context	 GetOclContext()
 {
 	return ocl_core[0].g_CLContext;
 }		
-DLL_EXPORTS	 cl_command_queue  GetOclCommandQueue()
+DLL_EXPORTS	 cl_command_queue  GetOclCommandQueue0()
 {
-	return ocl_core[0].g_CLCommandQueue;
+	return ocl_core[0].g_CLCommandQueue0;
+}
+DLL_EXPORTS	 cl_command_queue  GetOclCommandQueue1()
+{
+	return ocl_core[0].g_CLCommandQueue1;
 }
 DLL_EXPORTS  cl_program   GetOclProgram() 
 {
@@ -78,22 +83,26 @@ DLL_EXPORTS  int  clMemcpyBuf(void **src, void **dst,
 							  clMemcpyFlag flag, 
 							  size_t src_offset,
 							  size_t dst_offset, 
-							  cl_bool sync, 
+							  cl_bool sync,
+							  cl_command_queue cq,
+							  int      ev_num,
+							  cl_event *ev_wait,
 							  cl_event *ev)
 {
 	cl_int status = -1;
 
-	cl_command_queue cq = ocl_core[0].g_CLCommandQueue;
+	if(NULL == cq)
+	    cq = ocl_core[0].g_CLCommandQueue0;
 
 	if (clMemcpyHostToDevice == flag)
 		status = clEnqueueWriteBuffer(cq, (cl_mem)(*dst), sync, dst_offset, size, 
-		                              (void*)((char*)(*src)+src_offset), 0, 0, ev);
+		                              (void*)((char*)(*src)+src_offset), ev_num, ev_wait, ev);
 	else if (clMemcpyDeviceToHost == flag)
 		status = clEnqueueReadBuffer( cq, (cl_mem)(*src), sync, src_offset, size, 
-	                                  (void*)((char*)(*dst)+dst_offset), 0, 0, ev);	
+	                                  (void*)((char*)(*dst)+dst_offset), ev_num, ev_wait, ev);	
 	else if (clMemcpyDeviceToDevice == flag)
 		status = clEnqueueCopyBuffer( cq, (cl_mem)(*src), (cl_mem)(*dst), 
-		                              src_offset, dst_offset, size, 0, 0, ev);
+		                              src_offset, dst_offset, size, ev_num, ev_wait, ev);
 
 	return status;
 }
@@ -135,14 +144,18 @@ DLL_EXPORTS  int  clMemcpyImg2D(void **src, void **dst,
 								size_t rowPitch,   //  set the row pitch of CPU buffer
 								size_t bufOffset ,
 								cl_bool sync  ,
-								cl_event* ev )
+								cl_command_queue cq ,
+							    int      ev_num ,
+							    cl_event *ev_wait,
+							    cl_event *ev)
 {
     int status = -1;
 
 	size_t *sOrigin;
 	size_t *dOrigin;
 	size_t region[3] = {width, height, 1};
-	cl_command_queue cq = ocl_core[0].g_CLCommandQueue;
+	if(NULL == cq)
+	    cq = ocl_core[0].g_CLCommandQueue0;
 
 	if (NULL == src_origin)
 	{
@@ -165,15 +178,15 @@ DLL_EXPORTS  int  clMemcpyImg2D(void **src, void **dst,
 		dOrigin = dst_origin;
 
 	if (clMemcpyHostToDevice == flag)
-		status = clEnqueueWriteImage(cq, (cl_mem)(*dst), sync, dOrigin, region, rowPitch, 0, (void*)(*src), 0, 0, ev);
+		status = clEnqueueWriteImage(cq, (cl_mem)(*dst), sync, dOrigin, region, rowPitch, 0, (void*)(*src), ev_num, ev_wait, ev);
 	else if (clMemcpyDeviceToHost == flag)
-		status = clEnqueueReadImage( cq, (cl_mem)(*src), sync, sOrigin, region, rowPitch, 0, (void*)(*dst), 0, 0, ev);	
+		status = clEnqueueReadImage( cq, (cl_mem)(*src), sync, sOrigin, region, rowPitch, 0, (void*)(*dst), ev_num, ev_wait, ev);	
 	else if (clMemcpyImgToImg == flag)
-		status = clEnqueueCopyImage( cq, (cl_mem)(*src), (cl_mem)(*dst), sOrigin, dOrigin, region, 0, 0, ev);
+		status = clEnqueueCopyImage( cq, (cl_mem)(*src), (cl_mem)(*dst), sOrigin, dOrigin, region, ev_num, ev_wait, ev);
 	else if (clMemcpyImgToBuf == flag)
-		status = clEnqueueCopyImageToBuffer(cq, (cl_mem)(*src), (cl_mem)(*dst), sOrigin, region, bufOffset, 0, 0, ev);
+		status = clEnqueueCopyImageToBuffer(cq, (cl_mem)(*src), (cl_mem)(*dst), sOrigin, region, bufOffset, ev_num, ev_wait, ev);
 	else if (clMemcpyBufToImg == flag)
-		status = clEnqueueCopyBufferToImage(cq, (cl_mem)(*src), (cl_mem)(*dst), bufOffset, sOrigin, region, 0, 0, ev);
+		status = clEnqueueCopyBufferToImage(cq, (cl_mem)(*src), (cl_mem)(*dst), bufOffset, sOrigin, region, ev_num, ev_wait, ev);
 
 
 	if (NULL == dst_origin)
@@ -216,13 +229,17 @@ static cl_int clInitialize(cl_context ct, cl_command_queue cq, cl_device_id cd)
 				return status;
 		}
 		if (NULL != cq)
-			ocl_core[0].g_CLCommandQueue = cq;
+			ocl_core[0].g_CLCommandQueue0 = cq;
 		else
 		{	
-			ocl_core[0].g_CLCommandQueue = clCreateCommandQueue(ocl_core[0].g_CLContext, cd, 0, &status);
+			ocl_core[0].g_CLCommandQueue0 = clCreateCommandQueue(ocl_core[0].g_CLContext, cd, 0, &status);
 			if (CL_SUCCESS != status)
 				return status;
 		}
+		//maybe can pass from outside
+		ocl_core[0].g_CLCommandQueue1 = clCreateCommandQueue(ocl_core[0].g_CLContext, cd, 0, &status);
+			if (CL_SUCCESS != status)
+				return status;
 	}
 	else  //initialize the OCL envrioment inside
 	{
@@ -270,7 +287,8 @@ static cl_int clInitialize(cl_context ct, cl_command_queue cq, cl_device_id cd)
 		}
 
 		//create the command
-		ocl_core[0].g_CLCommandQueue = clCreateCommandQueue(ocl_core[0].g_CLContext, ocl_core[0].g_CLDevices, 0, &status);
+		ocl_core[0].g_CLCommandQueue0 = clCreateCommandQueue(ocl_core[0].g_CLContext, ocl_core[0].g_CLDevices, 0, &status);
+		ocl_core[0].g_CLCommandQueue1 = clCreateCommandQueue(ocl_core[0].g_CLContext,  ocl_core[0].g_CLDevices, 0, &status);
 		if (CL_SUCCESS != status)
 		{
 			if(platformId) delete[] platformId;

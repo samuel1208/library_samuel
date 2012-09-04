@@ -38,7 +38,7 @@ int main(int argc, char **argv)
 
     time_stamp(0, NULL);
     // for(int i=0; i<1; i++)
-	FFT_1D(src, dst2,log2(N));
+	FFT_R2C_1D(src, dst2,log2(N));
     for(int i=0; i<8; i++)
       	printf("%f, %f\n", dst2[i].real, dst2[i].imaginary);
     time_stamp(1, "FFT");
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
 
     time_stamp(0, NULL);
     // for(int i=0; i<1; i++)
-	FFT_1D_1(src, dst3,log2(N));
+	FFT_R2C_1D(src, dst3,log2(N));
     for(int i=0; i<N; i++)
       	printf("%f, %f\n", dst3[i].real, dst3[i].imaginary);
 	printf("\n FFT_1D_2: \n");
