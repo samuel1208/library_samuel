@@ -15,7 +15,7 @@
     e(j@) = cos(@) + jsin(@)
 */
 
- DLL_EXPORTS  int  DFT_1D(double *src,  complex_t *dst, int N)
+DLL_EXPORTS  int  DFT_1D(double *src,  complex_t *dst, int N)
 {
     int  status = -1;
     int  i, j; 
@@ -32,15 +32,15 @@
     for (i=0; i<=N_2; i++)
     { 
         temp = 2*PI_T*i/N;
-	angle = 0;
+        angle = 0;
         for (j=0; j<N; j++)
-	{
-	    dst[i].real += src[j] * cos(angle);
-	    dst[i].imaginary -= src[j] * sin(angle);
-	    angle += temp;
+        {
+            dst[i].real += src[j] * cos(angle);
+            dst[i].imaginary -= src[j] * sin(angle);
+            angle += temp;
         }
-	dst[i].real /= 1;
-	dst[i].imaginary /= 1;
+        dst[i].real /= 1;
+        dst[i].imaginary /= 1;
     }
     
     status = 0;
@@ -75,20 +75,20 @@ DLL_EXPORTS   int  IDFT_1D(complex_t *src, double *dst, int N)
     for (i=0; i<N; i++)
     { 
         temp = 2*PI_T*i/N;
-	value = angle = 0;
+        value = angle = 0;
         for (j=0; j<N; j++)
         {
-	    if(j > N_2)  
-	    {
-	        index = N - j;
-		value  +=  src[index].real * cos(angle) +  src[index].imaginary * sin(angle);
-	    }
-	    else
-	        value  +=  src[j].real * cos(angle) - src[j].imaginary * sin(angle);
+            if(j > N_2)  
+            {
+                index = N - j;
+                value  +=  src[index].real * cos(angle) +  src[index].imaginary * sin(angle);
+            }
+            else
+                value  +=  src[j].real * cos(angle) - src[j].imaginary * sin(angle);
        	   
-	    angle += temp;
+            angle += temp;
         }
-	dst[i] = value;
+        dst[i] = value;
     }
 
     status = 0;
@@ -119,24 +119,24 @@ DLL_EXPORTS int FFT_1D_t(double *src, complex_t *dst, int N)
     for (i=0;i<num;i++) 
     {
         dst[i].imaginary=0;
-	dst[i].real=src[i];
+        dst[i].real=src[i];
     }
 
     //Rader algorithm
     for (i=0;i<num-1;i++)
     {
         if (i < j)
-	{
-	    dst[i].real = src[j];
-	    dst[j].real = src[i];	
-	}
-	k = num2;
-	while (k <= j) 
-	{
-	    j -= k;
-	    k >>= 1;
-	}
-	j += k;
+        {
+            dst[i].real = src[j];
+            dst[j].real = src[i];	
+        }
+        k = num2;
+        while (k <= j) 
+        {
+            j -= k;
+            k >>= 1;
+        }
+        j += k;
     }
 
     c1 = -1.0; 
@@ -145,34 +145,34 @@ DLL_EXPORTS int FFT_1D_t(double *src, complex_t *dst, int N)
     for (l=0;l<N;l++) 
     {
         l1 = l2;
-	l2 <<= 1;
-	u1 = 1.0; 
-	u2 = 0.0;
-	for (j=0;j<l1;j++) 
-	{
-	    for (i=j;i<num;i+=l2) 
-	    {
-	        i1 = i + l1;
-		t1 = u1 * dst[i1].real - u2 * dst[i1].imaginary;
-		t2 = u1 * dst[i1].imaginary + u2 * dst[i1].real;
-		dst[i1].real = dst[i].real - t1; 
-		dst[i1].imaginary = dst[i].imaginary - t2;
-		dst[i].real += t1;
-		dst[i].imaginary += t2;
-	    }
-	    z  = u1 * c1 - u2 * c2;
-	    u2 = u1 * c2 + u2 * c1;
-	    u1 = z;
-	}
-	c2 = -sqrt((1.0 - c1) / 2.0);
-	c1 = sqrt((1.0 + c1) / 2.0);
+        l2 <<= 1;
+        u1 = 1.0; 
+        u2 = 0.0;
+        for (j=0;j<l1;j++) 
+        {
+            for (i=j;i<num;i+=l2) 
+            {
+                i1 = i + l1;
+                t1 = u1 * dst[i1].real - u2 * dst[i1].imaginary;
+                t2 = u1 * dst[i1].imaginary + u2 * dst[i1].real;
+                dst[i1].real = dst[i].real - t1; 
+                dst[i1].imaginary = dst[i].imaginary - t2;
+                dst[i].real += t1;
+                dst[i].imaginary += t2;
+            }
+            z  = u1 * c1 - u2 * c2;
+            u2 = u1 * c2 + u2 * c1;
+            u1 = z;
+        }
+        c2 = -sqrt((1.0 - c1) / 2.0);
+        c1 = sqrt((1.0 + c1) / 2.0);
     }
 
     /* Scaling for forward transform */
     for (i=0;i<num;i++)
     {
         dst[i].real /= num;
-	dst[i].imaginary /= num;
+        dst[i].imaginary /= num;
     }
 
     status = 0;
@@ -201,57 +201,57 @@ DLL_EXPORTS  int FFT_R2C_1D(double *src, complex_t *dst, int N)
     for (i=0;i<num;i++) 
     {
         dst[i].imaginary=0;
-	dst[i].real=src[i];
+        dst[i].real=src[i];
     }
-
+    
     //Rader algorithm
     for (i=0;i<num-1;i++)
     {
         if (i < j)
-	{
-	    dst[i].real = src[j];
-	    dst[j].real = src[i];	
-	}
-	k = num2;
-	while (k <= j) 
-	{
-	    j -= k;
-	    k >>= 1;
-	}
-	j += k;
+        {
+            dst[i].real = src[j];
+            dst[j].real = src[i];	
+        }
+        k = num2;
+        while (k <= j) 
+        {
+            j -= k;
+            k >>= 1;
+        }
+        j += k;
     }
 	
     for(m=1; m<=N; m++)
     {
         le = 2<<(m-1);
-	lei = le/2;
-	u1 = 1.0;
-	u2 = 0.0;
-	c1 = cos(PI_T/lei);
-	c2 = -sin(PI_T/lei);
-	
-	for(j=0; j<lei; j++)
-	{
-	    for(i=j; i<num; i+=le)
-	    {
-	        ip = i+lei;		
-		t1 = u1 * dst[ip].real - u2 * dst[ip].imaginary;
-		t2 = u1 * dst[ip].imaginary + u2 * dst[ip].real;
-		dst[ip].real = dst[i].real - t1; 
-		dst[ip].imaginary = dst[i].imaginary - t2;
-		dst[i].real += t1;
-		dst[i].imaginary += t2;
-	    }
-	    z  = u1 * c1 - u2 * c2;
-	    u2 = u1 * c2 + u2 * c1;
-	    u1 = z;
-	}
-
+        lei = le/2;
+        u1 = 1.0;
+        u2 = 0.0;
+        c1 = cos(PI_T/lei);
+        c2 = -sin(PI_T/lei);
+        
+        for(j=0; j<lei; j++)
+        {
+            for(i=j; i<num; i+=le)
+            {
+                ip = i+lei;		
+                t1 = u1 * dst[ip].real - u2 * dst[ip].imaginary;
+                t2 = u1 * dst[ip].imaginary + u2 * dst[ip].real;
+                dst[ip].real = dst[i].real - t1; 
+                dst[ip].imaginary = dst[i].imaginary - t2;
+                dst[i].real += t1;
+                dst[i].imaginary += t2;
+            }
+            z  = u1 * c1 - u2 * c2;
+            u2 = u1 * c2 + u2 * c1;
+            u1 = z;
+        }
+        
     }
     for (i=0;i<num;i++)
     {
         dst[i].real /= num;
-	dst[i].imaginary /= num;
+        dst[i].imaginary /= num;
     }
     status = 0;
     __SAM_END__;
@@ -288,45 +288,45 @@ DLL_EXPORTS  int  FFT_C2R_1D(complex_t *src, double *dst, int N)
     for (i=0;i<num-1;i++)
     {
         if (i < j)
-	{
-	    _dst[i] = src[j];
-	    _dst[j] = src[i];	
-	}
-	k = num2;
-	while (k <= j) 
-	{
-	    j -= k;
-	    k >>= 1;
-	}
-	j += k;
+        {
+            _dst[i] = src[j];
+            _dst[j] = src[i];	
+        }
+        k = num2;
+        while (k <= j) 
+        {
+            j -= k;
+            k >>= 1;
+        }
+        j += k;
     }
 	
     for(m=1; m<=N; m++)
     {
         le = 2<<(m-1);
-	lei = le/2;
-	u1 = 1.0;
-	u2 = 0.0;
-	c1 = cos(PI_T/lei);
-	c2 = sin(PI_T/lei);
-	
-	for(j=0; j<lei; j++)
-	{
-	    for(i=j; i<num; i+=le)
-	    {
-	        ip = i+lei;		
-		t1 = u1 * _dst[ip].real - u2 * _dst[ip].imaginary;
-		t2 = u1 * _dst[ip].imaginary + u2 * _dst[ip].real;
-		_dst[ip].real = _dst[i].real - t1; 
-		_dst[ip].imaginary = _dst[i].imaginary - t2;
-		_dst[i].real += t1;
-		_dst[i].imaginary += t2;
-	    }
-	    z  = u1 * c1 - u2 * c2;
-	    u2 = u1 * c2 + u2 * c1;
-	    u1 = z;
-	}
-
+        lei = le/2;
+        u1 = 1.0;
+        u2 = 0.0;
+        c1 = cos(PI_T/lei);
+        c2 = sin(PI_T/lei);
+        
+        for(j=0; j<lei; j++)
+        {
+            for(i=j; i<num; i+=le)
+            {
+                ip = i+lei;		
+                t1 = u1 * _dst[ip].real - u2 * _dst[ip].imaginary;
+                t2 = u1 * _dst[ip].imaginary + u2 * _dst[ip].real;
+                _dst[ip].real = _dst[i].real - t1; 
+                _dst[ip].imaginary = _dst[i].imaginary - t2;
+                _dst[i].real += t1;
+                _dst[i].imaginary += t2;
+            }
+            z  = u1 * c1 - u2 * c2;
+            u2 = u1 * c2 + u2 * c1;
+            u1 = z;
+        }
+        
     }
     for (i=0;i<num;i++)
     {
@@ -363,45 +363,44 @@ DLL_EXPORTS  int FFT_C2C_1D(complex_t *src, complex_t *dst, int N, int dir)
     for (i=0;i<num-1;i++)
     {
         if (i < j)
-	{
-	    dst[i] = src[j];
-	    dst[j] = src[i];	
-	}
-	k = num2;
-	while (k <= j) 
-	{
-	    j -= k;
-	    k >>= 1;
-	}
-	j += k;
+        {
+            dst[i] = src[j];
+            dst[j] = src[i];	
+        }
+        k = num2;
+        while (k <= j) 
+        {
+            j -= k;
+            k >>= 1;
+        }
+        j += k;
     }
 	
     for(m=1; m<=N; m++)
     {
         le = 2<<(m-1);
-	lei = le/2;
-	u1 = 1.0;
-	u2 = 0.0;
-	c1 = cos(PI_T/lei);
-	c2 = -sin(PI_T/lei)*dir;
-	
-	for(j=0; j<lei; j++)
-	{
-	    for(i=j; i<num; i+=le)
-	    {
-	        ip = i+lei;		
-		t1 = u1 * dst[ip].real - u2 * dst[ip].imaginary;
-		t2 = u1 * dst[ip].imaginary + u2 * dst[ip].real;
-		dst[ip].real = dst[i].real - t1; 
-		dst[ip].imaginary = dst[i].imaginary - t2;
-		dst[i].real += t1;
-		dst[i].imaginary += t2;
-	    }
-	    z  = u1 * c1 - u2 * c2;
-	    u2 = u1 * c2 + u2 * c1;
-	    u1 = z;
-	}
-
+        lei = le/2;
+        u1 = 1.0;
+        u2 = 0.0;
+        c1 = cos(PI_T/lei);
+        c2 = -sin(PI_T/lei)*dir;
+        
+        for(j=0; j<lei; j++)
+        {
+            for(i=j; i<num; i+=le)
+            {
+                ip = i+lei;		
+                t1 = u1 * dst[ip].real - u2 * dst[ip].imaginary;
+                t2 = u1 * dst[ip].imaginary + u2 * dst[ip].real;
+                dst[ip].real = dst[i].real - t1; 
+                dst[ip].imaginary = dst[i].imaginary - t2;
+                dst[i].real += t1;
+                dst[i].imaginary += t2;
+            }
+            z  = u1 * c1 - u2 * c2;
+            u2 = u1 * c2 + u2 * c1;
+            u1 = z;
+        }
     }
 	if(1==dir)
 	{

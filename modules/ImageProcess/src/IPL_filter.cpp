@@ -6,9 +6,9 @@
 
 //gaussian filter
 static int convolution_X(const unsigned char *srcImg , int srcStep,
-							unsigned char *dstImg,  int dstStep,
-							int width, int height,  int channel, 
-							float *kernel,int kernelSize, float kernelSum);
+						       unsigned char *dstImg,  int dstStep,
+                               int width, int height,  int channel, 
+							   float *kernel,int kernelSize, float kernelSum);
 							
 							
 /************************  median filter  *************************
@@ -19,7 +19,7 @@ min sum distance of itself with other pixels
 /******************************************************************/
 DLL_EXPORTS int  MedianFilter(const unsigned char *srcImg , int srcStep,
 				                    unsigned char *dstImg,  int dstStep,
-				              int width, int height,  int kernelSize)
+				                    int width, int height,  int kernelSize)
 {
 	int  res = -1;	
 	const unsigned char  *ptr1 = NULL;	
@@ -52,7 +52,7 @@ DLL_EXPORTS int  MedianFilter(const unsigned char *srcImg , int srcStep,
 			{
 				ptr3 = ptr1 + (i-semiKernelSize) * srcStep;
 				for (int j=0; j<kernelSize; j++)
-						val[i*kernelSize +j] = ptr3[w+j-semiKernelSize];
+                    val[i*kernelSize +j] = ptr3[w+j-semiKernelSize];
 			}
 			//only need to sort semi size
 			for (int i=0; i<kernelSize*kernelSize/2 +1; i++)
@@ -141,9 +141,9 @@ static int convolution_X(const unsigned char *srcImg , int srcStep,
 
 
 DLL_EXPORTS int  GaussianFilter(const unsigned char *srcImg , int srcStep,
-				          unsigned char *dstImg,  int dstStep,
-				          int width, int height,  int channel,
-						  float *gauss_kernel,    int kernelSize, float kernelSum)
+				                unsigned char *dstImg,  int dstStep,
+                                int width, int height,  int channel,
+                                float *gauss_kernel,    int kernelSize, float kernelSum)
 {
 	int  res = -1;	
 	int semiKernelSize = kernelSize/2;

@@ -214,8 +214,8 @@ DLL_EXPORTS  int  clMemFree(void **mem)
 static cl_int clInitialize(cl_context ct, cl_command_queue cq, cl_device_id cd)
 {
 	cl_int	status = -1;
-	unsigned int i=0;
-	
+        unsigned int i=0;
+   
 	//initialize the OCL envrioment  outside
 	if (NULL != cd)
 	{

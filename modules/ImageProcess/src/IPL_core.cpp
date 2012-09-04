@@ -39,13 +39,13 @@ static int CVT_RGB2HSL(const unsigned char *srcImg,  int srcStep,
 	if ( (NULL == srcImg) || (NULL == dstImg))
 		EXIT;
 
-	for (int i=0; i<height; i++)
+    for (int i=0; i<height; i++)
 	{
-		ptr1 = srcImg + i*srcStep;
-		ptr2 = dstImg + i*dstStep;
+        ptr1 = srcImg + i*srcStep;
+        ptr2 = dstImg + i*dstStep;
 		for (int j=0; j<width; j++)
 		{
-			r = ptr1[j*3]/255.0f;
+            r = ptr1[j*3]/255.0f;
 			g = ptr1[j*3+1]/255.0f;
 			b = ptr1[j*3+2]/255.0f;
 			maxPix = MAX(MAX(r,g),b);
@@ -59,7 +59,7 @@ static int CVT_RGB2HSL(const unsigned char *srcImg,  int srcStep,
 			if (diff > FLT_EPSILON)
 			{
 				//compute s
-				if (l<0.5)			
+                if (l<0.5)			
 					s = diff/(maxPix+minPix);
 				else if (l>=0.5)
 					s = diff/(2-maxPix-minPix);
@@ -72,10 +72,10 @@ static int CVT_RGB2HSL(const unsigned char *srcImg,  int srcStep,
 					h = 4 + (r-g)/diff;
 				if (h<0) h += 6 ;
 			}
-			ptr2[j*3]   = (int)(h*30);
+            ptr2[j*3]   = (int)(h*30);
 			ptr2[j*3+1] = (int)(s*255);
-			ptr2[j*3+2] = (int)(l*255);
-	     }
+		    ptr2[j*3+2] = (int)(l*255);
+        }
 	}
 
 	res = 0;
@@ -251,8 +251,8 @@ static  int  Resize_Bilinear(const unsigned char *srcImg, int srcWidth, int srcH
 	return  res;
 }
 DLL_EXPORTS int  Resize(const unsigned char *srcImg, int srcWidth, int srcHeight, int srcStep,
-					      unsigned char *dstImg, int dstWidth, int dstHeight, int dstStep,
-					      float xScale, float yScale, int channel, int InterpolationFlag)
+					          unsigned char *dstImg, int dstWidth, int dstHeight, int dstStep,
+					          float xScale, float yScale, int channel, int InterpolationFlag)
 {
 	int  res = -1;
 

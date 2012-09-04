@@ -9,9 +9,9 @@
 
 unsigned int log2( unsigned int x )
 {
-  unsigned int ans = 0 ;
-  while( x>>=1 ) ans++;
-  return ans ;
+    unsigned int ans = 0 ;
+    while( x>>=1 ) ans++;
+    return ans ;
 }
 
 int main(int argc, char **argv)
