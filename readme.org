@@ -1,12 +1,36 @@
+* build
+** refer to setup.py in install folder
+
 * module
-** cmake 
-   usage: cmake -D SHARED_LIBRARY  -D OCL_ENABLE=on .. // create the shared library. default static library.
-** memory manage
+** core
+*** Time:
+   usage: 1.time_stamp(0, NULL)
+          2.time_stamp(1, "tmie name")
+*** memory manage:
    usage: 1.buffer = MM_MemAlloc(NULL, size) //get a big buffer from system
           2.MM_MemMgrCreate(buffer,lMemSize ) // create a memory manage handle form buffer. lMemSize<size
           ...
           3.MM_MemFree(NULL, &buffer)
+		  
 ** OpenCL module
+*** OpenCL core
+    support two command
+*** OpenCL lib
+    FFT/IFFT(1/2D) 
+    Histogram Statistics
+    Reduction for min 
+    Eexclusive Scan 
+    Matrix Transpose
+    Test kernel (only for test)
+** ImageProcess
+*** core
+    Image color transorm, 
+    image Resize	
+*** miscellaneous
+    FFT
+    Filter (Median , Gaussian)
+	Wavelet Transform
+
 * Todo list
-**Todo  add time test,  
+**Done  add time test,  
 **Todo  add log between _SAMBENIN_ to END 
