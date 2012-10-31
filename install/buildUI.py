@@ -3,6 +3,11 @@ import os
 import sys
 import subprocess
 
+
+if "posix" == os.name:
+    print('ok')
+    subprocess.call("export LD_LIBRARY_PATH=/home/fshen/Install_samuel/Python/python3.2.3/lib", shell=True)
+
 IsPython3 = version.IsPython3
 
 if  "3" == IsPython3 :
@@ -14,7 +19,7 @@ elif "2" == IsPython3:
 __metaclass__ = type
 class BuildUI:
     "The UI of build"
-    def __init__(self,width=320, height=240) :
+    def __init__(self,width=320, height=480) :
         self.__mainFrame(width, height)
 
     def __mainFrame(self, width, height):
@@ -71,6 +76,9 @@ class BuildUI:
         frame.update()
         self.__IS_SHARED_LIBRARY = StringVar()
         self.__IS_SHARED_LIBRARY.set("1")
+		
+        self.__IS_DEBUG_LIBRARY = StringVar()
+        self.__IS_DEBUG_LIBRARY.set("1")
 
         #radio button need to bundle with a persist value to a group
         rb0 = Radiobutton(frame, text="Library Static", variable= self.__IS_SHARED_LIBRARY, value="0", width=12, anchor=W)
@@ -78,6 +86,14 @@ class BuildUI:
         rb0.update()    
         rb1 = Radiobutton(frame, text="Library Shared", variable= self.__IS_SHARED_LIBRARY, value="1", width=12, anchor=W)
         rb1.place(x=2, y= rb0.winfo_height()+frame.winfo_height()/10)
+        rb1.update()
+		
+        rb2 = Radiobutton(frame, text="Library Debug", variable= self.__IS_DEBUG_LIBRARY, value="1", width=12, anchor=W)
+        rb2.place(x=2, y= rb1.winfo_height()+rb0.winfo_height()+frame.winfo_height()/10+4)
+        rb2.update()    
+        rb3 = Radiobutton(frame, text="Library Release", variable= self.__IS_DEBUG_LIBRARY, value="0", width=12, anchor=W)
+        rb3.place(x=2, y= rb1.winfo_height()+rb0.winfo_height()+rb2.winfo_height()+frame.winfo_height()/10+4)
+        
         
         #checkbox
         self.__OCL_ENABLE = StringVar()
@@ -138,6 +154,8 @@ class BuildUI:
 
         if "1" == self.__IS_SHARED_LIBRARY.get():
             cmake_str += " -D SHARED_LIBRARY=on "
+        if "1" == self.__IS_DEBUG_LIBRARY.get():
+            cmake_str += " -D CMAKE_BUILD_TYPE=Debug "
         if "1" == self.__OCL_ENABLE.get():
             cmake_str += " -D OCL_ENABLE=on "
         if "1" == self.__OGL_ENABLE.get():
@@ -182,6 +200,7 @@ class BuildUI:
 ### UI variables
     root  = None
     __IS_SHARED_LIBRARY = None
+    __IS_DEBUG_LIBRARY = None
     __OCL_ENABLE = None	
     __OGL_ENABLE = None
     __COMPILER = None

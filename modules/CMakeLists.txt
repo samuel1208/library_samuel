@@ -31,6 +31,7 @@ include_directories(./SamCore/inc)
 #generate the MMange library
 add_subdirectory(SamCore)
 add_subdirectory(ImageProcess)
+add_subdirectory(ComputerVision)
 
 #generate the OCLCore library
 if(OCL_ENABLE)
@@ -46,5 +47,8 @@ if(OCL_ENABLE)
     add_subdirectory(OCLCore)
 	add_subdirectory(OCLLibrary)	
 endif()
+
+#generate testbed
+add_subdirectory(testbed)
 
 

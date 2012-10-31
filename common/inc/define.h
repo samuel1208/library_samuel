@@ -16,11 +16,22 @@ typedef  int                 MBool ;
 typedef  void                MVoid ;
 typedef  void*               MHandle ;
 
+
+typedef struct __complex_t
+{
+  double  real;
+  double  imaginary; 
+}complex_t;
+
+#ifndef NULL 
+#define NULL 0 
+#endif 
+
 #define MFalse		0
 #define MTrue		1
 
-#define MAX(a,b) ((a)>(b)?(a):(b))
-#define MIN(a,b) ((a)<(b)?(a):(b))
+#define SAM_MAX(a,b) ((a)>(b)?(a):(b))
+#define SAM_MIN(a,b) ((a)<(b)?(a):(b))
 #define PI_T 3.1415926
 //the dll macro
 #ifndef  DLL_LIBRARY
@@ -43,13 +54,6 @@ typedef  void*               MHandle ;
 
 #define SAM_SUCCESS		0
 #define SAM_ERROR       -1
-
-
-typedef struct
-{
-  double  real;
-  double  imaginary; 
-}complex_t;
 
 
 
