@@ -162,15 +162,15 @@ int main (int argc, char **argv)
     while(NULL != (cmdPara=getCmdPara(argc, argv)))
     {
         if ((0==strcmp(cmdPara, "-t")) || (0==strcmp(cmdPara, "--detectorType"))) 
-            params.detectorType = atoi(cmdParaValue); 
+            params.detectorType = atoi(getCmdParaValue()); 
         else if ((0==strcmp(cmdPara, "-T")) || (0==strcmp(cmdPara, "--dtcAdapterType"))) 
-            params.dtcAdapterType = atoi(cmdParaValue);
+            params.dtcAdapterType = atoi(getCmdParaValue());
         else if (0==strcmp(cmdPara, "-n")) 
-          params.maxVisualWordNum =  atoi(cmdParaValue);         
+          params.maxVisualWordNum =  atoi(getCmdParaValue());         
         else if ((0==strcmp(cmdPara, "-i")) || (0==strcmp(cmdPara, "--inputPath")))
-            fileList  = cmdParaValue;
+            fileList  = getCmdParaValue();
         else if ((0==strcmp(cmdPara, "-o")) || (0==strcmp(cmdPara, "--outputPath")))
-            outputPath = cmdParaValue;
+            outputPath = getCmdParaValue();
         else if ((0==strcmp(cmdPara, "-h")) || (0==strcmp(cmdPara, "--help")))
         {
             usage();

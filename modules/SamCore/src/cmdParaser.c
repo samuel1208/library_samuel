@@ -1,8 +1,8 @@
 #include"cmdParaser.h"
 
 
-char  *cmdParaValue = NULL;
-int   cmdIndex = 1;
+static char  *cmdParaValue = NULL;
+static int   cmdIndex = 1;
 
 DLL_EXPORTS char* getCmdPara(int argc,char **argv)
 {
@@ -21,4 +21,15 @@ DLL_EXPORTS char* getCmdPara(int argc,char **argv)
     }
     return cmd;
 }
-  
+ 
+DLL_EXPORTS char* getCmdParaValue()
+{
+    return cmdParaValue;
+}
+
+/*cmdIndex point to  the next cmd para*/
+DLL_EXPORTS int   getCmdIndex()
+{
+    return cmdIndex; 
+}
+

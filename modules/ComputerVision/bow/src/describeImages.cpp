@@ -297,27 +297,27 @@ int main (int argc, char **argv)
     while(NULL != (cmdPara=getCmdPara(argc, argv)))
     {
         if (0==strcmp(cmdPara, "--useVoc"))
-            vocLabel = cmdParaValue;            
+            vocLabel = getCmdParaValue();            
         else if ((0==strcmp(cmdPara, "-a")) || (0==strcmp(cmdPara, "--algorithm")))
-            algorithm = cmdParaValue;        
+            algorithm = getCmdParaValue();        
         else if (0==strcmp(cmdPara, "--vPath"))
-            vPath = cmdParaValue; 
+            vPath = getCmdParaValue(); 
         else if ((0==strcmp(cmdPara, "-t")) || (0==strcmp(cmdPara, "--detectorType"))) 
-           params.detectorType = atoi(cmdParaValue);
+           params.detectorType = atoi(getCmdParaValue());
         else if ((0==strcmp(cmdPara, "-s")) || (0==strcmp(cmdPara, "--descriptorType"))) 
-            params.descriptorType = atoi(cmdParaValue);
+            params.descriptorType = atoi(getCmdParaValue());
         else if ((0==strcmp(cmdPara, "-T")) || (0==strcmp(cmdPara, "--dtcAdapterType"))) 
-            params.dtcAdapterType = atoi(cmdParaValue);
+            params.dtcAdapterType = atoi(getCmdParaValue());
         else if ((0==strcmp(cmdPara, "-S")) || (0==strcmp(cmdPara, "--dscAdapterType"))) 
-            params.dscAdapterType = atoi(cmdParaValue);
+            params.dscAdapterType = atoi(getCmdParaValue());
         else if ((0==strcmp(cmdPara, "-m")) || (0==strcmp(cmdPara, "--matcherType")))
-            params.matcherType = atoi(cmdParaValue);         
+            params.matcherType = atoi(getCmdParaValue());         
         else if ((0==strcmp(cmdPara, "-i")) || (0==strcmp(cmdPara, "--inputPath")))
-            inputPath  = cmdParaValue;
+            inputPath  = getCmdParaValue();
         else if ((0==strcmp(cmdPara, "-o")) || (0==strcmp(cmdPara, "--outputPath")))
-            outputPath = cmdParaValue;
+            outputPath = getCmdParaValue();
         else if (0==strcmp(cmdPara, "--imageSetFileList"))
-            fileList = cmdParaValue;
+            fileList = getCmdParaValue();
 
         else if ((0==strcmp(cmdPara, "-h")) || (0==strcmp(cmdPara, "--help")))
         {
