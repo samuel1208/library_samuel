@@ -376,7 +376,8 @@ int main (int argc, char **argv)
         return 1;
     }
     delete imageSet;
-
+    
+    cout<<"Finished \n";
     return 0;
 }
 

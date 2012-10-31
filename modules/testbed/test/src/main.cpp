@@ -82,8 +82,9 @@ int main(int argc, char** argv)
             printf("%4d  ", intImg[j+i*w]);
         printf("\n");
     }
-    MM_MemFree(NULL, (void**)src);
-    MM_MemFree(NULL, (void**)intImg);
+    MM_MemFree(NULL, (void**)&src);
+    MM_MemFree(NULL, (void**)&intImg);
+    printf("Finished \n");
     return 0;
 }
 #endif

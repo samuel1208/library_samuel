@@ -200,6 +200,6 @@ int main (int argc, char **argv)
         cerr << "Warning: There is none word." << endl;
         return 1;
     }
-   
+    cout<< "Finished \n";   
     return 0;
 }
