@@ -34,9 +34,19 @@ extern "C" {
                             );
 
     DLL_EXPORTS int  IntegralImage(
-                                   const unsigned char *srcImg, int srcStep, int srcWidth, int srcHeight,
+                                   const unsigned char *srcImg,  int srcStep,  int srcWidth,  int srcHeight,
                                          unsigned int **intImg,  int &intStep, int &intWidth, int &intHeight
                                    );
+
+    DLL_EXPORTS int  dilate(
+                             unsigned char *srcImg, int srcStep, 
+                             unsigned char *temp,   int width_src, int height_src, int semi_win_size
+                           );
+    
+    DLL_EXPORTS int  erode(
+                            unsigned char *srcImg, int srcStep, 
+                            unsigned char *temp,   int width_src, int height_src, int semi_win_size
+                          );
 
 #ifdef __cplusplus
 }

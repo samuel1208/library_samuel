@@ -11,6 +11,7 @@
 
 #include "imageDataSet.hpp"
 #include "vocDataSet.hpp"
+#include "Time_t.h"
 using namespace cv;
 using namespace std;
 using namespace sam_bow;
@@ -214,13 +215,20 @@ describe_images_bow (
     
     Ptr<Mat> im = imBase.getNextImage();
     char str[10]={0};
-    int count = 0;
+    int count = 0;    
+    std::string fileListPath = outputPath + '/' + "fileList_bow.txt";
+    std::fstream fileList(fileListPath.c_str(), std::fstream::out);
 
     if(0 != readVocabulary(vocabularyPath.c_str(), vocabularies))
         EXIT;
     bowDescriptor->setVocabulary(vocabularies);
     allDescriptions = new Mat(0, bowDescriptor->descriptorSize(), bowDescriptor->descriptorType());
 
+    if(!fileList.is_open())
+    {
+        std::cerr<<"ERROR:: can't open the file:" <<fileListPath.c_str()<<std::endl;
+        EXIT;
+    }
 
     for (; !im.empty(); im = imBase.getNextImage())
     {
@@ -233,13 +241,16 @@ describe_images_bow (
             memset(str,0,10); 
             sprintf(str,"%d", count++);
             descriptionFileName = outputPath + '/' + imBase.getCurrentImageName()+'_'+imBase.getCurrentObjectName()+str+".yml";
-                
             descriptions = describe_roi_bow(*sub_im, detector, bowDescriptor);
             if (!descriptions->empty()) 
-                writeDescriptions(descriptionFileName, *descriptions, imBase.getCurrentObjectName());        
+            {
+                writeDescriptions(descriptionFileName, *descriptions, imBase.getCurrentObjectName());   
+                fileList<< descriptionFileName.c_str()<<std::endl;
+            }     
         }
     }
     ret = allDescriptions;
+    fileList.close();
 
     __SAM_END__;
 
@@ -340,7 +351,7 @@ int main (int argc, char **argv)
 ///
 /// MAIN
 ///
-    
+    time_stamp(0, NULL);
     initModule_nonfree(); // It should be called to register SURF and SIFT, otherwise
                           // there will be assert failed.
     imageDataSet *imageSet = NULL;
@@ -376,7 +387,7 @@ int main (int argc, char **argv)
         return 1;
     }
     delete imageSet;
-    
+    time_stamp(1, "describeImage");
     cout<<"Finished \n";
     return 0;
 }

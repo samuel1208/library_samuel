@@ -1,9 +1,11 @@
 #include "bow.hpp"
 #include "cmdParaser.h"
+#include <iostream>
 #include <fstream>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/nonfree/nonfree.hpp>
 #include <opencv2/nonfree/features2d.hpp>
+#include <Time_t.h>
 
 using namespace std;
 using namespace cv;
@@ -56,32 +58,32 @@ Ptr<Mat> build_vocabularies(
     BOWKMeansTrainer bowTrainer(wordCount, terminate_criterion, attempts, flag);
 
     int feature_num = 0;
-    int maxDescriptionCount = 100000;
+    int maxDescriptionCount = 500000;
     int count = 0;
     Mat descriptions;
     Ptr<Mat> allDescriptions;
     ifstream ifile(fileList.c_str(), ifstream::in);
     if(!ifile.is_open())
-        EXIT;
+        return NULL;
 
     // get the feature dimention
     {
         string file , className;
         ifile>>file;
         if(0 != readDescriptions(file.c_str(), descriptions, className))
-            EXIT;
+            return NULL;
         feature_num = descriptions.cols;
         allDescriptions = new Mat(maxDescriptionCount,feature_num, CV_32FC1);  
-        if(0 == readDescriptions(file.c_str(), descriptions, className))
-        {
-            for (int j = 0; j < descriptions.rows; j++)
-            {        
-                float *p = descriptions.ptr<float>(j);
-                float *q = allDescriptions->ptr<float>(count);
-                for (int k = 0; k < feature_num; k++)
-                    *q++ = *p++;
-                ++count;
-            }
+       
+        for (int j = 0; j < descriptions.rows; j++)
+        {        
+            if(count >= maxDescriptionCount )
+                break;
+            float *p = descriptions.ptr<float>(j);
+            float *q = allDescriptions->ptr<float>(count);
+            for (int k = 0; k < feature_num; k++)
+                *q++ = *p++;
+            ++count;
         }
     }
     
@@ -90,6 +92,8 @@ Ptr<Mat> build_vocabularies(
     {
         string file , className;
         ifile>>file;
+        if (count >= maxDescriptionCount )
+                break;
         if(0 != readDescriptions(file.c_str(), descriptions, className))
             continue;
         for (int j = 0; j < descriptions.rows; j++)
@@ -99,14 +103,14 @@ Ptr<Mat> build_vocabularies(
                 break;
             float *p = descriptions.ptr<float>(j);
             float *q = allDescriptions->ptr<float>(count);
-            for (int k = 0; k < feature_num; k++)
+
+             for (int k = 0; k < feature_num; k++)
                 *q++ = *p++;
             ++count;
         }
     }
-    cout<<"cluster "<<count<<"features"<<endl;
-    //Mat descs(allDescriptions, Range(0, count));
-    //bowTrainer.add(descs);
+    cout<<"cluster "<<count<<" features : start"<<endl;
+    
     bowTrainer.add(*allDescriptions);
          
     *vocabulary = bowTrainer.cluster();
@@ -192,6 +196,7 @@ int main (int argc, char **argv)
 ///
 /// MAIN
 ///
+    time_stamp(0, NULL);
 
     initModule_nonfree(); // It should be called otherwise SURF and SIFT will
     
@@ -200,6 +205,8 @@ int main (int argc, char **argv)
         cerr << "Warning: There is none word." << endl;
         return 1;
     }
+
+    time_stamp(1, "build vocabulary");
     cout<< "Finished \n";   
     return 0;
 }

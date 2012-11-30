@@ -21,6 +21,16 @@ static int CVT_RGB2YCrCb(const unsigned char *srcImg,  int srcStep,
 static  int  Resize_Bilinear(const unsigned char *srcImg, int srcWidth, int srcHeight, int srcStep,
 							       unsigned char *dstImg, int dstWidth, int dstHeight, int dstStep,
 							       float xScale, float yScale, int channel);
+
+//erode and dilate
+
+static  int  __dilate_x( unsigned char *srcImg, int srcStep, 
+                         unsigned char *dstImg, int dstStep, 
+                         int width_src, int height_src, int semi_win_size);
+
+static  int  __erode_x( unsigned char *srcImg, int srcStep, 
+                         unsigned char *dstImg, int dstStep, 
+                         int width_src, int height_src, int semi_win_size);
 								   
 /************************  convert color   ************************/
 /********  support RGB to HSL, HSV, GRAY, YCrCb      **************/
@@ -346,10 +356,10 @@ DLL_EXPORTS int  Resize(const unsigned char *srcImg, int srcWidth, int srcHeight
 
 
 /************************   integral image   ************************/
-/* alloc the memory inside for integral image */
+/*         alloc the memory inside for integral image               */
 #define   INT_IMAGE_EDGE      (2)
 DLL_EXPORTS int  IntegralImage(
-                               const unsigned char *srcImg, int srcStep,  int srcWidth,   int srcHeight,
+                               const unsigned char *srcImg,  int srcStep,  int srcWidth,   int srcHeight,
                                      unsigned int  **intImg, int &intStep, int &intWidth, int &intHeight
                                )
 {
@@ -415,5 +425,146 @@ DLL_EXPORTS int  IntegralImage(
     if((0!=res) && (NULL != *intImg))
         MM_MemFree(NULL, (void**)intImg);
     return res;
+}
+/****************************************************************************/
+
+/***********************       erode and dilate       **********************/
+/*                   do erode or dilate in the srcimg                      */
+//max semi_win_size = 5;
+#define GET_MIN_VAL(win_size, pTempVal, tempVal, i)   \
+		tempVal = pTempVal[0];                        \
+		for(i=1; i<win_size; i++)                     \
+	        tempVal = SAM_MIN(tempVal, pTempVal[i])        
+
+#define GET_MAX_VAL(win_size, pTempVal, tempVal, i)   \
+    	tempVal = pTempVal[0];                        \
+	    for(i=1; i<win_size; i++)                     \
+	        tempVal = SAM_MAX(tempVal, pTempVal[i])      
+
+int __erode_x(unsigned char *srcImg, int srcStep, unsigned char *dstImg, int dstStep, int width_src, int height_src, int semi_win_size)
+{
+	int x, y, i;
+	int index, __index;
+	unsigned char pTempVal[11]={0}, tempVal;
+	unsigned char *pSrc;
+	int win_size = 0;
+	if((NULL == dstImg) || (NULL == srcImg))
+		return -1;
+	
+	if(semi_win_size<1)
+		semi_win_size= 1;
+	else if(semi_win_size>5)
+		semi_win_size = 5;
+
+	win_size = 2*semi_win_size+1;
+
+	//width must >= 2
+	for (y=0; y<height_src; y++)
+	{
+		pSrc = srcImg + y*srcStep;
+	
+		tempVal = pSrc[0];
+		for(x=0; x<=semi_win_size; x++)
+			pTempVal[x] = tempVal;
+		for(; x<win_size-1; x++)
+			pTempVal[x] = pSrc[x-semi_win_size];
+
+		index = win_size-1;
+		for(x=0; x< width_src-semi_win_size; x++)
+		{
+			__index = index % win_size;
+			//get the value 
+			pTempVal[__index] = pSrc[x+semi_win_size];
+			GET_MIN_VAL(win_size, pTempVal, tempVal, i);
+			dstImg[y+x*dstStep] = tempVal;
+			index++;
+		}
+				 
+		for(; x<width_src; x++)
+		{
+			__index = index % win_size;
+			//get the value 
+			pTempVal[__index] = pSrc[width_src-1];
+			GET_MIN_VAL(win_size, pTempVal, tempVal, i);
+			dstImg[y+x*dstStep] = tempVal;	
+			index++;
+		}
+	}
+	return 0;
+}
+
+
+int __dilate_x(unsigned char *srcImg, int srcStep, unsigned char *dstImg, int dstStep, int width_src, int height_src, int semi_win_size)
+{
+	int x, y, i;
+	int index, __index;
+	unsigned char pTempVal[11]={0}, tempVal;
+	unsigned char *pSrc;
+	int win_size = 0;
+	if((NULL == dstImg) || (NULL == srcImg))
+		return -1;
+	
+	if(semi_win_size<1)
+		semi_win_size= 1;
+	else if(semi_win_size>5)
+		semi_win_size = 5;
+	
+	win_size = 2*semi_win_size+1;
+	
+	//width must >= 2
+	for (y=0; y<height_src; y++)
+	{
+		pSrc = srcImg + y*srcStep;
+		
+		tempVal = pSrc[0];
+		for(x=0; x<=semi_win_size; x++)
+			pTempVal[x] = tempVal;
+		for(; x<win_size-1; x++)
+			pTempVal[x] = pSrc[x-semi_win_size];
+		
+		index = win_size-1;
+		for(x=0; x< width_src-semi_win_size; x++)
+		{
+			__index = index % win_size;
+			//get the value 
+			pTempVal[__index] = pSrc[x+semi_win_size];
+			GET_MAX_VAL(win_size, pTempVal, tempVal, i);
+			dstImg[y+x*dstStep] = tempVal;
+			index++;
+		}
+		
+		for(; x<width_src; x++)
+		{
+			__index = index % win_size;
+			//get the value 
+			pTempVal[__index] = pSrc[width_src-1];
+			GET_MAX_VAL(win_size, pTempVal, tempVal, i);
+			dstImg[y+x*dstStep] = tempVal;	
+			index++;
+		}
+	}
+	return 0;
+}
+
+DLL_EXPORTS  int erode(unsigned char *srcImg, int srcStep, unsigned char *temp, int width_src, int height_src, int semi_win_size)
+{
+	if ( (NULL == srcImg) || (NULL == temp))
+		return -1;
+	if(0 != __erode_x(srcImg, srcStep, temp, height_src, width_src, height_src, semi_win_size))
+		return -1;
+	if(0 != __erode_x(temp, height_src, srcImg, srcStep, height_src, width_src, semi_win_size))
+		return -1;
+	return 0;
+}
+
+DLL_EXPORTS  int dilate(unsigned char *srcImg, int srcStep, unsigned char *temp, int width_src, int height_src, int semi_win_size)
+{
+	if ( (NULL == srcImg) || (NULL == temp))
+		return -1;
+	if(0 != __dilate_x(srcImg, srcStep, temp, height_src, width_src, height_src, semi_win_size))
+		return -1;
+	if(0 != __dilate_x(temp, height_src, srcImg, srcStep, height_src, width_src, semi_win_size))
+		return -1;
+	return 0;
 }
 /****************************************************************************/

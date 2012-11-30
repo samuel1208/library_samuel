@@ -35,4 +35,6 @@ int  writeDescriptions( const std::string& filename,  const cv::Mat& description
 int  readDescriptions ( const std::string& filename,  cv::Mat& descriptions, std::string& className);
 int  readVocabulary ( const std::string& filename,  cv::Mat& vocabularies);
 int  writeVocabulary (const std::string& filename,  const cv::Mat& vocabulary );
+int  convertToCSV(const std::string& fileName, char* posClassName, std::ofstream &output);
+
 #endif

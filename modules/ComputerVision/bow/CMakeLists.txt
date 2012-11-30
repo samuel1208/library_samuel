@@ -13,3 +13,8 @@ set(src_files "src/buildVocabulary.cpp" "src/bowParam.cpp" "src/imageDataSet.cpp
 add_executable(${target}  ${src_files})
 target_link_libraries(${target} ${OpenCV_LIBS} SamCore)
 
+set(target "generateCSVData")
+set(src_files "src/generateCSVData.cpp"  "src/imageDataSet.cpp" )
+add_executable(${target}  ${src_files})
+target_link_libraries(${target} ${OpenCV_LIBS} SamCore)
+

@@ -26,9 +26,16 @@
     Matrix Transpose
     Test kernel (only for test)
 ** ImageProcess
-*** core
-    Image color transorm, 
-    image Resize	
+*** IPL_core.h:
+    1. Image color transorm: RGB2HSL , RGB2HSV,  RGB2GRAY, RGB2YCrCb
+    ** TODO use int type operation like the RGB2YCrCb
+       
+    2. Image Resize: bilinear.	
+    3. Integral Image : Get the intergral image, 
+           Alloc the integral image memory inside. So you should free it out side.
+    4. Image morphology operation: erode ,dilate.
+           Only support gray image. And the max winsize is 11.
+        
 *** miscellaneous
     FFT
     Filter (Median , Gaussian)

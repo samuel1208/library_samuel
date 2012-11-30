@@ -12,9 +12,9 @@ static int convolution_X(const unsigned char *srcImg , int srcStep,
 							
 							
 /************************  median filter  *************************
-1¡¢Only support 1 channel
-2¡¢Can't separate it into x and y directions 
-3¡¢ 3 channeles is not same  as 1 channel , In 3 channels get the 
+1. Only support 1 channel
+2. Can't separate it into x and y directions 
+3. 3 channeles is not same  as 1 channel , In 3 channels get the 
 min sum distance of itself with other pixels 
 /******************************************************************/
 DLL_EXPORTS int  MedianFilter(const unsigned char *srcImg , int srcStep,
@@ -104,11 +104,22 @@ static int convolution_X(const unsigned char *srcImg , int srcStep,
 		ptr2 = dstImg + h*channel;
 		for (w=0; w<semiKernelSize; w++)
 		{
+            int index =0;
+			val[0] = val[1] = val[2] = 0;
+            for(k=0; k<kernelSize; k++)
+			{
+                index = w-semiKernelSize+k;
+                if(index < 0)
+                    index = 0;
+                for(c=0; c<channel; c++)
+                {
+                    val[c] += ptr1[(w-semiKernelSize+k)*channel + c] * kernel[k];
+                }
+            }
 			for(c=0; c<channel; c++)
 			{
-				ptr2[w*dstStep+c] = ptr1[w*channel + c];
-			}
-			
+				ptr2[w*dstStep+c] = val[c]/kernelSum;
+            }
 		}
 		for(w=semiKernelSize; w<width-semiKernelSize; w++)
 		{
@@ -127,10 +138,22 @@ static int convolution_X(const unsigned char *srcImg , int srcStep,
 		}
 		for(w=width-semiKernelSize; w<width; w++)
 		{
+            int index =0;
+			val[0] = val[1] = val[2] = 0;
+            for(k=0; k<kernelSize; k++)
+			{
+                index = w-semiKernelSize+k;
+                if(index > width-1)
+                    index = width-1;
+                for(c=0; c<channel; c++)
+                {
+                    val[c] += ptr1[(w-semiKernelSize+k)*channel + c] * kernel[k];
+                }
+            }
 			for(c=0; c<channel; c++)
 			{
-				ptr2[w*dstStep+c] = ptr1[w*channel + c];
-			}
+				ptr2[w*dstStep+c] = val[c]/kernelSum;
+            }		   
 		}
 	}
 
