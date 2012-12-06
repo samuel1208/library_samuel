@@ -7,7 +7,8 @@
 #include <IPL_core.h>
 #include <Time_t.h>
 #include "MemManager.h"
-
+#include "cv.h"
+#include "highgui.h"
 unsigned int log2( unsigned int x )
 {
     unsigned int ans = 0 ;
@@ -56,7 +57,7 @@ int main(int argc, char **argv)
 
     return 0;
 }
-#else
+#elif 0
 
 int main(int argc, char** argv)
 {
@@ -87,4 +88,36 @@ int main(int argc, char** argv)
     printf("Finished \n");
     return 0;
 }
+
+#else
+int main(int argc, char** argv)
+{
+    IplImage *src = cvLoadImage("/home/fshen/samuel/10.jpeg");
+
+
+    IplImage *_src = cvCreateImage(cvSize(640, 480), 8, 3);
+ 
+    
+    IplImage *gray = cvCreateImage(cvSize(_src->width, _src->height), 8, 1);
+
+    Resize((unsigned char*)src->imageData,src->width, src->height, src->widthStep,
+           (unsigned char*)_src->imageData,_src->width, _src->height, _src->widthStep,
+           src->width*1.0/_src->width,src->height*1.0/_src->height, 3,0 );
+
+    CVTColor((unsigned char*)_src->imageData, _src->widthStep,(unsigned char*) gray->imageData, gray->widthStep,gray->width, gray->height, IPL_RGB2GRAY);
+
+    cvNamedWindow("src_gray");
+    cvShowImage("src_gray", gray);
+    cvWaitKey(0);
+    HistEqualization((unsigned char*)gray->imageData, gray->widthStep, gray->width, gray->height);
+    cvNamedWindow("dst_gray");
+    cvShowImage("dst_gray", gray);
+    cvWaitKey(0);
+    cvReleaseImage(&src);
+    cvReleaseImage(&_src);
+    cvReleaseImage(&gray);
+    return 0;
+}
+
+
 #endif

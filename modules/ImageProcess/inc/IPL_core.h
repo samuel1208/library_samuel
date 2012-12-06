@@ -21,32 +21,33 @@ enum RESIZE_FLAG
 extern "C" {
 #endif
 
-    DLL_EXPORTS int  CVTColor(
-                              const unsigned char *srcImg , int srcStep,
-                                    unsigned char *dstImg,  int dstStep,
-                                    int width, int height,  int CVTFormat
+    DLL_EXPORTS  int  CVTColor(
+                               const unsigned char *srcImg , int srcStep,
+                                     unsigned char *dstImg,  int dstStep,
+                                     int width, int height,  int CVTFormat
                               );
 
-    DLL_EXPORTS int  Resize(
-                            const unsigned char *srcImg, int srcWidth, int srcHeight, int srcStep,
-                                  unsigned char *dstImg, int dstWidth, int dstHeight, int dstStep,
-                                  float xScale, float yScale, int channel, int InterpolationFlag 
+    DLL_EXPORTS  int  Resize(
+                             const unsigned char *srcImg, int srcWidth, int srcHeight, int srcStep,
+                                   unsigned char *dstImg, int dstWidth, int dstHeight, int dstStep,
+                                   float xScale, float yScale, int channel, int InterpolationFlag 
                             );
 
-    DLL_EXPORTS int  IntegralImage(
-                                   const unsigned char *srcImg,  int srcStep,  int srcWidth,  int srcHeight,
-                                         unsigned int **intImg,  int &intStep, int &intWidth, int &intHeight
+    DLL_EXPORTS  int  IntegralImage(
+                                    const unsigned char *srcImg,  int srcStep,  int srcWidth,  int srcHeight,
+                                          unsigned int **intImg,  int &intStep, int &intWidth, int &intHeight
                                    );
 
-    DLL_EXPORTS int  dilate(
+    DLL_EXPORTS  int  dilate(
                              unsigned char *srcImg, int srcStep, 
                              unsigned char *temp,   int width_src, int height_src, int semi_win_size
-                           );
+                            );
     
-    DLL_EXPORTS int  erode(
+    DLL_EXPORTS  int  erode(
                             unsigned char *srcImg, int srcStep, 
                             unsigned char *temp,   int width_src, int height_src, int semi_win_size
-                          );
+                           );
+    DLL_EXPORTS  int  HistEqualization(unsigned char *srcImg, int widthStep, int width, int height);
 
 #ifdef __cplusplus
 }
