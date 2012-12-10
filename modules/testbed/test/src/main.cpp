@@ -10,6 +10,7 @@
 #include "MemManager.h"
 #include "cv.h"
 #include "highgui.h"
+#include "queue_t.hpp"
 unsigned int log2( unsigned int x )
 {
     unsigned int ans = 0 ;
@@ -90,7 +91,7 @@ int main(int argc, char** argv)
     return 0;
 }
 
-#else
+#elif 0
 int main(int argc, char** argv)
 {
     IplImage *src = cvLoadImage("/home/fshen/samuel/res_20_0.jpg");
@@ -116,6 +117,24 @@ int main(int argc, char** argv)
     cvReleaseImage(&_src);
     cvReleaseImage(&gray);
     return 0;
+}
+
+#else
+
+int main(int argc, char** argv)
+{
+  
+      Queue_t<int> q(2);
+      int val;
+      //  printf("%d\n",q.init());
+    // printf("%d\n",q.push(33));
+    // q.pop(val);
+    // printf("%d\n",val);
+
+
+
+    return 0;
+   
 }
 
 
