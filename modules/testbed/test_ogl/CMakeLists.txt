@@ -1,4 +1,4 @@
-define_testbed(test_ogl 0 SamCore ImageProcess ${OpenCV_LIBS} glut32)
+define_testbed(test_ogl  SamCore ImageProcess  glut GLU )
 
 
 

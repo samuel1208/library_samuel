@@ -1,8 +1,7 @@
 
-
-#include <glut.h>
-#include <windows.h>
-#include <gl/gl.h>
+#if 0
+#include <GL/glut.h>
+#include <GL/gl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include<string.h>
@@ -25,7 +24,6 @@ void init ( void )
      glEnable (GL_DEPTH_TEST);
 }
 
-/*调用GLUT函数，绘制一个球*/
 void display ( void )
 {
      glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -34,7 +32,6 @@ void display ( void )
 }
 
 
-/* 定义GLUT的reshape函数，w、h分别是当前窗口的宽和高*/
 void reshape (int w, int h)
 {
      glViewport (0, 0, (GLsizei) w, (GLsizei) h);
@@ -49,7 +46,6 @@ void reshape (int w, int h)
 }
 
 
-/* 定义对键盘的响应函数 */
 void keyboard ( unsigned char key, int x, int y)
 {
      /*按Esc键退出*/
@@ -63,28 +59,168 @@ void keyboard ( unsigned char key, int x, int y)
 
 int main(int argc, char **argv)
 {
-	     /* GLUT环境初始化*/
+	  
     glutInit (&argc, argv);
-     /* 显示模式初始化 */
-     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-     /* 定义窗口大小 */
-     glutInitWindowSize (300, 300);
-     /* 定义窗口位置 */
-     glutInitWindowPosition (100, 100);
-    /* 显示窗口，窗口标题为执行函数名 */
-     glutCreateWindow ( "HelloWorld" );
-     /* 调用OpenGL初始化函数 */
-     init ( );
-     /* 注册OpenGL绘图函数 */
-     glutDisplayFunc ( display );
-     /* 注册窗口大小改变时的响应函数 */
-     glutReshapeFunc ( reshape );
-     /* 注册键盘响应函数 */
-     glutKeyboardFunc ( keyboard );
-     /* 进入GLUT消息循环，开始执行程序 */
-     glutMainLoop( );
+    glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize (300, 300);
+    glutInitWindowPosition (100, 100);
+    glutCreateWindow ( "HelloWorld" );
+    init ( );
+    glutDisplayFunc ( display );
+    glutReshapeFunc ( reshape );
+    glutKeyboardFunc ( keyboard );
+    glutMainLoop( );
+    
+}
+#elif 0
+#include <GL/glut.h>
+#include <stdlib.h>
 
-	printf("hello world\n");
+static GLfloat spin = 0.0;
+
+void display(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+   // glPushMatrix();
+   // glRotatef(spin, 0.0, 0.0, 1.0);
+   // glColor3f(1.0, 1.0, 1.0);
+   // glRectf(-25.0, -25.0, 25.0, 25.0);
+   // glPopMatrix();
+   // glPointSize(4);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glBegin(GL_POLYGON);
+    glVertex2f(0, 0);
+    glVertex2f(0, 20);
+    glVertex2f(10,30 );
+    glVertex2f(20, 20);
+    glVertex2f(20, 0);
+    glEnd();
+glFinish();
+    // glutSwapBuffers();
 }
 
+void spinDisplay(void)
+{
+   spin = spin + 2.0;
+   if (spin > 360.0)
+      spin = spin - 360.0;
+   glutPostRedisplay();
+}
+
+void init(void) 
+{
+   glClearColor (0.0, 0.0, 0.0, 0.0);
+   glColor3f(1,1,1);
+   glShadeModel (GL_FLAT);
+}
+
+void reshape(int w, int h)
+{
+   glViewport (0, 0, (GLsizei) w, (GLsizei) h);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   //glOrtho(-50.0, 50.0, -50.0, 50.0, -1.0, 1.0);
+   gluOrtho2D(0,(GLdouble) w, 0,(GLdouble) h);
+   glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
+}
+
+void mouse(int button, int state, int x, int y) 
+{
+   switch (button) {
+      case GLUT_LEFT_BUTTON:
+         if (state == GLUT_DOWN)
+            glutIdleFunc(spinDisplay);
+         break;
+      case GLUT_MIDDLE_BUTTON:
+      case GLUT_RIGHT_BUTTON:
+         if (state == GLUT_DOWN)
+            glutIdleFunc(NULL);
+         break;
+      default:
+         break;
+   }
+}
+   
+/* 
+ *  Request double buffer display mode.
+ *  Register mouse input callback functions
+ */
+int main(int argc, char** argv)
+{
+   glutInit(&argc, argv);
+   glutInitDisplayMode (// GLUT_DOUBLE |
+                        GLUT_RGB);
+   glutInitWindowSize (250, 250); 
+   glutInitWindowPosition (100, 100);
+   glutCreateWindow (argv[0]);
+   init ();
+   glutDisplayFunc(display); 
+   glutReshapeFunc(reshape); 
+   // glutMouseFunc(mouse);
+   glutMainLoop();
+   return 0;   /* ANSI C requires main to return int. */
+}
+
+#else 
+#include <GL/glut.h>
+#include <stdlib.h>
+
+void init(void) 
+{
+   glClearColor (0.0, 0.0, 0.0, 0.0);
+   glShadeModel (GL_FLAT);
+}
+
+void display(void)
+{
+   glClear (GL_COLOR_BUFFER_BIT);
+   glColor3f (1.0, 1.0, 1.0);
+   glLoadIdentity ();             /* clear the matrix */
+           /* viewing transformation  */
+   gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0);
+   glScalef (1.0, 2.0, 1.0);      /* modeling transformation */ 
+   glutWireCube (1.0);
+   glFlush ();
+}
+
+void reshape (int w, int h)
+{
+   glViewport (0, 0, (GLsizei) w, (GLsizei) h); 
+   glMatrixMode (GL_PROJECTION);
+   glLoadIdentity ();
+   // glFrustum (-1.0, 1.0, -1.0, 1.0, 1.5, 20.0);
+   glMatrixMode (GL_MODELVIEW);
+}
+
+void keyboard(unsigned char key, int x, int y)
+{
+   switch (key) {
+      case 27:
+         exit(0);
+         break;
+   }
+}
+
+int main(int argc, char** argv)
+{
+   glutInit(&argc, argv);
+   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
+   glutInitWindowSize (500, 500); 
+   glutInitWindowPosition (100, 100);
+   glutCreateWindow (argv[0]);
+   init ();
+   glutDisplayFunc(display); 
+   glutReshapeFunc(reshape);
+   glutKeyboardFunc(keyboard);
+   glutMainLoop();
+   return 0;
+}
+
+
+ 
+#endif
 

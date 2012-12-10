@@ -33,6 +33,9 @@ add_subdirectory(SamCore)
 add_subdirectory(ImageProcess)
 add_subdirectory(ComputerVision)
 
+if(OGL_ENABLE)
+    add_subdirectory(OGLModule)
+endif()
 #generate the OCLCore library
 if(OCL_ENABLE)
     find_package(CUDA)

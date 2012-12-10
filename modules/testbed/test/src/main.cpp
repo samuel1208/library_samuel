@@ -5,6 +5,7 @@
 #include "define.h"
 #include <IPL_fft.h>
 #include <IPL_core.h>
+#include <IPL_imageEnhancing.h>
 #include <Time_t.h>
 #include "MemManager.h"
 #include "cv.h"
@@ -92,13 +93,10 @@ int main(int argc, char** argv)
 #else
 int main(int argc, char** argv)
 {
-    IplImage *src = cvLoadImage("/home/fshen/samuel/10.jpeg");
-
-
-    IplImage *_src = cvCreateImage(cvSize(640, 480), 8, 3);
- 
-    
+    IplImage *src = cvLoadImage("/home/fshen/samuel/res_20_0.jpg");
+    IplImage *_src = cvCreateImage(cvSize(src->width/2, src->height/2), 8, 3);    
     IplImage *gray = cvCreateImage(cvSize(_src->width, _src->height), 8, 1);
+    IplImage *dstGray = cvCreateImage(cvSize(_src->width, _src->height), 8, 1);
 
     Resize((unsigned char*)src->imageData,src->width, src->height, src->widthStep,
            (unsigned char*)_src->imageData,_src->width, _src->height, _src->widthStep,
@@ -109,9 +107,10 @@ int main(int argc, char** argv)
     cvNamedWindow("src_gray");
     cvShowImage("src_gray", gray);
     cvWaitKey(0);
-    HistEqualization((unsigned char*)gray->imageData, gray->widthStep, gray->width, gray->height);
+    //HistEqualization((unsigned char*)gray->imageData, gray->widthStep, gray->width, gray->height);
+    LaplaceEnhancing((unsigned char*)gray->imageData, gray->widthStep, (unsigned char*)dstGray->imageData, dstGray->widthStep, gray->width, gray->height, 4);
     cvNamedWindow("dst_gray");
-    cvShowImage("dst_gray", gray);
+    cvShowImage("dst_gray", dstGray);
     cvWaitKey(0);
     cvReleaseImage(&src);
     cvReleaseImage(&_src);

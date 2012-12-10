@@ -47,7 +47,6 @@ extern "C" {
                             unsigned char *srcImg, int srcStep, 
                             unsigned char *temp,   int width_src, int height_src, int semi_win_size
                            );
-    DLL_EXPORTS  int  HistEqualization(unsigned char *srcImg, int widthStep, int width, int height);
 
 #ifdef __cplusplus
 }

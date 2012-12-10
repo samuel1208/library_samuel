@@ -29,6 +29,7 @@ include_directories(../SamCore/inc)
 include_directories(../ImageProcess/inc)
 add_subdirectory(test)
 if(OGL_ENABLE)
+    include_directories(../OGLModule/inc)
     add_subdirectory(test_ogl)
 endif()
 
