@@ -67,7 +67,7 @@ DLL_EXPORTS  int HistEqualization(unsigned char *srcImg, int widthStep, int widt
 DLL_EXPORTS  int  LaplaceEnhancing(
                                    const unsigned char *srcImg, int srcStep, 
                                          unsigned char *dstImg, int dstStep,
-                                         int width, int height, int method
+                                         int width, int height, int Connectivity
                                   )
 {
 
@@ -78,7 +78,7 @@ DLL_EXPORTS  int  LaplaceEnhancing(
     if ((NULL==srcImg) || (NULL==dstImg))
         return -1;
 
-    if (4 == method)
+    if (4 == Connectivity)
     {
         //first line
         dstPtr = dstImg;

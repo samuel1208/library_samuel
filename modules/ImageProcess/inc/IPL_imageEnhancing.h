@@ -15,7 +15,7 @@ extern "C" {
     DLL_EXPORTS  int  LaplaceEnhancing(
                                        const unsigned char *srcImg, int srcStep, 
                                              unsigned char *dstImg, int dstStep, 
-                                             int width, int height, int method
+                                             int width, int height, int Connectivity
                                        );
 
 #ifdef __cplusplus

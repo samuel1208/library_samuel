@@ -11,6 +11,7 @@
 #include "cv.h"
 #include "highgui.h"
 #include "queue_t.hpp"
+#include "IPL_gradient.hpp"
 unsigned int log2( unsigned int x )
 {
     unsigned int ans = 0 ;
@@ -124,8 +125,17 @@ int main(int argc, char** argv)
 int main(int argc, char** argv)
 {
   
-      Queue_t<int> q(2);
-      int val;
+    int val=1;
+ 
+    
+    unsigned char gray[3*3]={0,1,21,34,24,51,16,47,38};
+    float res[3*3]={0};  
+    gradient_roberts<float>(res, 3, gray, 3,3,3);
+    for(int i=0; i<9; i++)
+    {
+        if(i%3==0)printf("\n");
+        printf("%d ,", res[i]);
+    }
       //  printf("%d\n",q.init());
     // printf("%d\n",q.push(33));
     // q.pop(val);

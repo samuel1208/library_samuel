@@ -32,6 +32,8 @@ typedef struct __complex_t
 
 #define SAM_MAX(a,b) ((a)>(b)?(a):(b))
 #define SAM_MIN(a,b) ((a)<(b)?(a):(b))
+
+#define SAM_ABS(a)  ((a)>0? (a):-(a))
 #define PI_T 3.1415926
 //the dll macro
 #ifndef  DLL_LIBRARY
