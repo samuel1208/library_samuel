@@ -1,4 +1,8 @@
 
+#include <stdlib.h>
+#include <cv.h>
+#include <highgui.h>
+
 #if 0
 #include <GL/glut.h>
 #include <GL/gl.h>
@@ -59,7 +63,7 @@ void keyboard ( unsigned char key, int x, int y)
 
 int main(int argc, char **argv)
 {
-	  
+	   setenv ("LIBGL_ALWAYS_INDIRECT", "yes", 1);
     glutInit (&argc, argv);
     glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize (300, 300);
@@ -73,6 +77,7 @@ int main(int argc, char **argv)
     
 }
 #elif 0
+
 #include <GL/glut.h>
 #include <stdlib.h>
 
@@ -112,7 +117,7 @@ void spinDisplay(void)
 
 void init(void) 
 {
-   glClearColor (0.0, 0.0, 0.0, 0.0);
+   glClearColor (1.0, 0.0, 0.0, 0.0);
    glColor3f(1,1,1);
    glShadeModel (GL_FLAT);
 }
@@ -151,6 +156,7 @@ void mouse(int button, int state, int x, int y)
  */
 int main(int argc, char** argv)
 {
+ setenv ("LIBGL_ALWAYS_INDIRECT", "yes", 1);
    glutInit(&argc, argv);
    glutInitDisplayMode (// GLUT_DOUBLE |
                         GLUT_RGB);
@@ -168,59 +174,116 @@ int main(int argc, char** argv)
 #else 
 #include <GL/glut.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-void init(void) 
+/*	Create checkerboard image	*/
+#define	checkImageWidth 64
+#define	checkImageHeight 64
+GLubyte checkImage[checkImageHeight][checkImageWidth][3];
+
+static GLdouble zoomFactor = 1.0;
+static GLint height;
+
+void makeCheckImage(void)
 {
+   int i, j, c;
+    
+   for (i = 0; i < checkImageHeight; i++) {
+      for (j = 0; j < checkImageWidth; j++) {
+         c = ((((i&0x8)==0)^((j&0x8))==0))*255;
+         checkImage[i][j][0] = (GLubyte) c;
+         checkImage[i][j][1] = (GLubyte) c;
+         checkImage[i][j][2] = (GLubyte) c;
+      }
+   }
+}
+
+void init(void)
+{    
    glClearColor (0.0, 0.0, 0.0, 0.0);
-   glShadeModel (GL_FLAT);
+   glShadeModel(GL_FLAT);
+   makeCheckImage();
+   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 }
 
 void display(void)
 {
-   glClear (GL_COLOR_BUFFER_BIT);
-   glColor3f (1.0, 1.0, 1.0);
-   glLoadIdentity ();             /* clear the matrix */
-           /* viewing transformation  */
-   gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0);
-   glScalef (1.0, 2.0, 1.0);      /* modeling transformation */ 
-   glutWireCube (1.0);
-   glFlush ();
+   glClear(GL_COLOR_BUFFER_BIT);
+   glRasterPos2i(0, 0);
+   glDrawPixels(checkImageWidth, checkImageHeight, GL_RGB, 
+                GL_UNSIGNED_BYTE, checkImage);
+   glFlush();
 }
 
-void reshape (int w, int h)
+void reshape(int w, int h)
 {
-   glViewport (0, 0, (GLsizei) w, (GLsizei) h); 
-   glMatrixMode (GL_PROJECTION);
-   glLoadIdentity ();
-   // glFrustum (-1.0, 1.0, -1.0, 1.0, 1.5, 20.0);
-   glMatrixMode (GL_MODELVIEW);
+   glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+   height = (GLint) h;
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   gluOrtho2D(0.0, (GLdouble) w, 0.0, (GLdouble) h);
+   glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
+}
+
+void motion(int x, int y)
+{
+   static GLint screeny;
+   
+   screeny = height - (GLint) y;
+   glRasterPos2i (x, screeny);
+   glPixelZoom (zoomFactor, zoomFactor);
+   glCopyPixels (0, 0, checkImageWidth, checkImageHeight, GL_COLOR);
+   glPixelZoom (1.0, 1.0);
+   glFlush ();
 }
 
 void keyboard(unsigned char key, int x, int y)
 {
    switch (key) {
+      case 'r':
+      case 'R':
+         zoomFactor = 1.0;
+         glutPostRedisplay();
+         printf ("zoomFactor reset to 1.0\n");
+         break;
+      case 'z':
+         zoomFactor += 0.5;
+         if (zoomFactor >= 3.0) 
+            zoomFactor = 3.0;
+         printf ("zoomFactor is now %4.1f\n", zoomFactor);
+         break;
+      case 'Z':
+         zoomFactor -= 0.5;
+         if (zoomFactor <= 0.5) 
+            zoomFactor = 0.5;
+         printf ("zoomFactor is now %4.1f\n", zoomFactor);
+         break;
       case 27:
          exit(0);
+         break;
+      default:
          break;
    }
 }
 
 int main(int argc, char** argv)
 {
-   glutInit(&argc, argv);
-   glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
-   glutInitWindowSize (500, 500); 
-   glutInitWindowPosition (100, 100);
-   glutCreateWindow (argv[0]);
-   init ();
-   glutDisplayFunc(display); 
-   glutReshapeFunc(reshape);
-   glutKeyboardFunc(keyboard);
-   glutMainLoop();
-   return 0;
+    IplImage  *src = cvLoadImage("/home/fshen/samuel/project_self/0.jpg");  
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(250, 250);
+    glutInitWindowPosition(100, 100);
+    glutCreateWindow(argv[0]);
+    init();
+    glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
+    glutKeyboardFunc(keyboard);
+    glutMotionFunc(motion);
+    glutMainLoop();
+
+
+    return 0; 
 }
-
-
- 
 #endif
 
