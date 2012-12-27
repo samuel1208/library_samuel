@@ -120,29 +120,33 @@ int main(int argc, char** argv)
     return 0;
 }
 
-#else
+#else //test the multithread
+#include "multiThread.h"
 
+ThreadRes  kernel(void* para)
+{
+    printf("thread %d\n", *((int*)(para)));
+    // return   *((int*)(para))
+    return (void*) -1;
+
+}
 int main(int argc, char** argv)
 {
-  
-    int val=1;
  
-    
-    unsigned char gray[3*3]={0,1,21,34,24,51,16,47,38};
-    float res[3*3]={0};  
-    gradient_roberts<float>(res, 3, gray, 3,3,3);
-    for(int i=0; i<9; i++)
+    int thread[10]={1,2,3,4,5,6,7,8,9,10};
+    MHandle thread_handle[10];
+    ThreadRes result[10];
+    for(int i=0; i<10; i++)
+        thread_handle[i] = MThreadCreate((void*)kernel, &thread[i]);
+
+    for(int i=0; i<10; i++)
+        MWaitForSingleThread(thread_handle[i],&result[i], 0);
+
+    for(int i=0; i<10; i++)
     {
-        if(i%3==0)printf("\n");
-        printf("%d ,", res[i]);
+        printf("%d \n", (int)result[i]);
     }
-      //  printf("%d\n",q.init());
-    // printf("%d\n",q.push(33));
-    // q.pop(val);
-    // printf("%d\n",val);
-
-
-
+   
     return 0;
    
 }

@@ -25,19 +25,21 @@ macro(define_testbed testbed MFC_ENABLE)
 endmacro(define_testbed)
 
 #the include files 
-include_directories(../SamCore/inc)
-include_directories(../ImageProcess/inc)
+include_directories(../samCore/inc)
+include_directories(../imageProcess/inc)
+include_directories(../multiThread/inc)
+
 add_subdirectory(test)
 if(OGL_ENABLE)
-    include_directories(../OGLModule/inc)
+    include_directories(../oglModule/inc)
     add_subdirectory(test_ogl)
 endif()
 
 
 #generate the testbeds
 if(OCL_ENABLE)
-include_directories(../OCLLibrary/inc)
-include_directories(../OCLCore/inc)
+include_directories(../oclLibrary/inc)
+include_directories(../oclCore/inc)
 include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/CL)
 link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/Win32)
 add_subdirectory(test_ocl)

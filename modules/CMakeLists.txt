@@ -26,15 +26,16 @@ macro(define_module module)
 endmacro(define_module)
 
 #the include files 
-include_directories(./SamCore/inc)
+include_directories(./samCore/inc)
 
 #generate the MMange library
-add_subdirectory(SamCore)
-add_subdirectory(ImageProcess)
-add_subdirectory(ComputerVision)
+add_subdirectory(samCore)
+add_subdirectory(imageProcess)
+add_subdirectory(computerVision)
+add_subdirectory(multiThread)
 
 if(OGL_ENABLE)
-    add_subdirectory(OGLModule)
+    add_subdirectory(oglModule)
 endif()
 #generate the OCLCore library
 if(OCL_ENABLE)
@@ -46,9 +47,9 @@ if(OCL_ENABLE)
     include_directories(${CUDA_TOOLKIT_ROOT_DIR}/include/CL)
 	link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib/Win32)
 	
-    include_directories(./OCLCore/inc)	
-    add_subdirectory(OCLCore)
-	add_subdirectory(OCLLibrary)	
+    include_directories(./oclCore/inc)	
+    add_subdirectory(oclCore)
+	add_subdirectory(oclLibrary)	
 endif()
 
 #generate testbed

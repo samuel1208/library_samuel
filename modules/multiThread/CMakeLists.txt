@@ -1,1 +1,1 @@
-define_module(SamCore)
+define_module(multiThread)
