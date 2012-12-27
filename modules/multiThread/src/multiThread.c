@@ -3,7 +3,6 @@
 
 
 #ifdef WIN32
-
 #include <process.h>
 #include <windows.h>
 typedef  unsigned (__stdcall *ThreadFunc)(MVoid *);
@@ -13,7 +12,7 @@ DLL_EXPORTS  MHandle  MThreadCreate(MVoid *pFunc,  MVoid *pPara)
     unsigned int dwThreadId;
    	if(NULL == pFunc)
 		return NULL;	
-    return (MHandle)_beginthreadx(NULL, 0, (ThreadFunc)pFunc, pParam, 0, &dwThreadId);
+    return (MHandle)_beginthreadex(NULL, 0, (ThreadFunc)pFunc, pPara, 0, &dwThreadId);
 }
 
 DLL_EXPORTS  int  MThreadDestory(MHandle hThread)
@@ -25,8 +24,15 @@ DLL_EXPORTS  int  MThreadDestory(MHandle hThread)
 
 DLL_EXPORTS  int  MWaitForSingleThread(MHandle hThread, ThreadRes *pResult, MUInt32 dwTimeOut)
 {
-    return (WAIT_OBJECT_0 == WaitForSingleObject(hThread, dwTimeOut)) ? 0 : -1;
-    // 0 is the right return value
+    if (WAIT_OBJECT_0 != WaitForSingleObject(hThread, dwTimeOut))
+		return -1;
+	if(NULL != pResult)
+	{
+		if (0 == GetExitCodeThread(hThread, pResult))
+			return -1;
+	}
+	return 0;
+ 
 }
 
 

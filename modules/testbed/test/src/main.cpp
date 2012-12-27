@@ -126,8 +126,7 @@ int main(int argc, char** argv)
 ThreadRes  kernel(void* para)
 {
     printf("thread %d\n", *((int*)(para)));
-    // return   *((int*)(para))
-    return (void*) -1;
+    return (ThreadRes) -10;
 
 }
 int main(int argc, char** argv)
@@ -140,12 +139,19 @@ int main(int argc, char** argv)
         thread_handle[i] = MThreadCreate((void*)kernel, &thread[i]);
 
     for(int i=0; i<10; i++)
-        MWaitForSingleThread(thread_handle[i],&result[i], 0);
+        MWaitForSingleThread(thread_handle[i],&result[i], MWAIT_INFINITE);
 
     for(int i=0; i<10; i++)
     {
         printf("%d \n", (int)result[i]);
     }
+
+//destroy the threads
+	for(int i=0; i<10; i++)
+	{
+		MThreadDestory(thread_handle[i]);
+	}
+
    
     return 0;
    

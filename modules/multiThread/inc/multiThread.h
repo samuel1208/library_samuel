@@ -9,9 +9,9 @@ extern "C" {
 #define MWAIT_INFINITE		(~0)
 
 #ifdef WIN32
-    typedef unsigned ThreadRes;   //return type of the thread function
+    typedef unsigned int  ThreadRes;   //return type of the thread function. It should be converted into int when use it
 #elif defined UNIX
-    typedef MVoid*   ThreadRes;   //return type of the thread function
+    typedef MVoid*   ThreadRes;        //return type of the thread function. It should be converted into int when use it
 #endif 
 
 DLL_EXPORTS  MHandle  MThreadCreate(MVoid *pFunc,  MVoid *pPara);
