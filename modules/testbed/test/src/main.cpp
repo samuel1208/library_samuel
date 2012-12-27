@@ -146,7 +146,7 @@ int main(int argc, char** argv)
         printf("%d \n", (int)result[i]);
     }
 
-//destroy the threads
+    //destroy the threads
 	for(int i=0; i<10; i++)
 	{
 		MThreadDestory(thread_handle[i]);

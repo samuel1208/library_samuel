@@ -1,7 +1,5 @@
 #include "multiThread.h"
 
-
-
 #ifdef WIN32
 #include <process.h>
 #include <windows.h>
@@ -9,10 +7,9 @@ typedef  unsigned (__stdcall *ThreadFunc)(MVoid *);
 
 DLL_EXPORTS  MHandle  MThreadCreate(MVoid *pFunc,  MVoid *pPara)
 {
-    unsigned int dwThreadId;
    	if(NULL == pFunc)
 		return NULL;	
-    return (MHandle)_beginthreadex(NULL, 0, (ThreadFunc)pFunc, pPara, 0, &dwThreadId);
+    return (MHandle)_beginthreadex(NULL, 0, (ThreadFunc)pFunc, pPara, 0, NULL);
 }
 
 DLL_EXPORTS  int  MThreadDestory(MHandle hThread)

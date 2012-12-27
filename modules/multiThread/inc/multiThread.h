@@ -11,7 +11,7 @@ extern "C" {
 #ifdef WIN32
     typedef unsigned int  ThreadRes;   //return type of the thread function. It should be converted into int when use it
 #elif defined UNIX
-    typedef MVoid*   ThreadRes;        //return type of the thread function. It should be converted into int when use it
+    typedef MVoid*        ThreadRes;   //return type of the thread function. It should be converted into int when use it
 #endif 
 
 DLL_EXPORTS  MHandle  MThreadCreate(MVoid *pFunc,  MVoid *pPara);
