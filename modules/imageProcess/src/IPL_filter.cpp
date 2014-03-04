@@ -113,7 +113,7 @@ static int convolution_X(const unsigned char *srcImg , int srcStep,
                     index = 0;
                 for(c=0; c<channel; c++)
                 {
-                    val[c] += ptr1[(w-semiKernelSize+k)*channel + c] * kernel[k];
+                    val[c] += ptr1[index*channel + c] * kernel[k];
                 }
             }
 			for(c=0; c<channel; c++)
@@ -147,7 +147,7 @@ static int convolution_X(const unsigned char *srcImg , int srcStep,
                     index = width-1;
                 for(c=0; c<channel; c++)
                 {
-                    val[c] += ptr1[(w-semiKernelSize+k)*channel + c] * kernel[k];
+                    val[c] += ptr1[index*channel + c] * kernel[k];
                 }
             }
 			for(c=0; c<channel; c++)
